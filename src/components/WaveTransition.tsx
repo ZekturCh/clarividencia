@@ -2,24 +2,24 @@ import type { CSSProperties } from 'react';
 
 export function WaveTransition({
   active,
-  message,
+  message: _message,
 }: {
   active: boolean;
   message: string;
 }) {
-  const wavePixels = Array.from({ length: 132 }, (_, index) => {
-    const column = index % 22;
-    const row = Math.floor(index / 22);
-    const drift = ((index * 17) % 11) - 5;
-    const size = 10 + ((index * 7) % 22);
+  const wavePixels = Array.from({ length: 216 }, (_, index) => {
+    const column = index % 24;
+    const row = Math.floor(index / 24);
+    const drift = ((index * 17) % 9) - 4;
+    const size = 12 + ((index * 7) % 26);
 
     return {
       id: index,
       style: {
-        '--x': `${column * 4.7 + drift}%`,
-        '--y': `${row * 17 + ((index * 13) % 9)}%`,
+        '--x': `${column * 4.35 + drift}%`,
+        '--y': `${row * 12.2 + ((index * 13) % 7)}%`,
         '--size': `${size}px`,
-        '--delay': `${column * 42 + row * 24}ms`,
+        '--delay': `${column * 18 + row * 16}ms`,
       } as CSSProperties,
     };
   });
@@ -32,16 +32,6 @@ export function WaveTransition({
         {wavePixels.map((pixel) => (
           <span key={pixel.id} style={pixel.style} />
         ))}
-      </div>
-      <div className="pixel-field">
-        {Array.from({ length: 36 }, (_, index) => (
-          <span key={index} />
-        ))}
-      </div>
-      <div className="ai-loader-grid" />
-      <div className="transition-hud">
-        <span>ClarividencIA</span>
-        <strong>{message}</strong>
       </div>
     </div>
   );
