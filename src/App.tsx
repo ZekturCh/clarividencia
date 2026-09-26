@@ -29,9 +29,9 @@ import { getVariableDelay } from './utils/timing';
 type FlowStep = 'start' | 'questions' | 'analysis' | 'result' | 'lead' | 'final';
 
 const transitionMessages = [
-  'Leyendo opciones',
-  'Analizando propuesta',
-  'Conectando señales culturales',
+  'Leyendo opciones seleccionadas',
+  'Analizando propuesta cultural',
+  'Conectando señales de equipo',
   'ClarividencIA está actuando para ti',
 ];
 
