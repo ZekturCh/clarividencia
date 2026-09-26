@@ -35,7 +35,7 @@ button {
 
 .app-shell {
   position: relative;
-  min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
   background:
     radial-gradient(circle at 82% 12%, rgba(66, 230, 196, 0.18), transparent 26rem),
@@ -46,14 +46,14 @@ button {
 .screen {
   position: relative;
   z-index: 1;
-  width: min(100%, 1080px);
-  min-height: 100vh;
+  width: min(100%, 1120px);
+  min-height: 100svh;
   margin: 0 auto;
-  padding: clamp(32px, 5vw, 86px);
+  padding: 72px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 36px;
+  gap: 34px;
 }
 
 .ambient-lines {
@@ -123,7 +123,7 @@ button {
 .eyebrow {
   margin: 0;
   color: var(--color-secondary);
-  font-size: clamp(1rem, 2vw, 1.45rem);
+  font-size: 1.2rem;
   font-weight: 850;
   text-transform: uppercase;
 }
@@ -138,19 +138,19 @@ p {
 h1 {
   margin-top: 18px;
   max-width: 900px;
-  font-size: clamp(4rem, 9vw, 7.8rem);
+  font-size: 6.2rem;
   line-height: 0.95;
   color: var(--color-primary);
 }
 
 h2 {
-  font-size: clamp(2.25rem, 5.2vw, 5rem);
+  font-size: 4.15rem;
   line-height: 1.02;
   color: var(--color-primary);
 }
 
 h3 {
-  font-size: clamp(1.3rem, 2vw, 2rem);
+  font-size: 1.75rem;
   color: var(--color-primary);
 }
 
@@ -158,19 +158,19 @@ h3 {
 .final-screen > p:not(.eyebrow) {
   margin-top: 24px;
   max-width: 720px;
-  font-size: clamp(1.5rem, 3vw, 2.45rem);
+  font-size: 2.05rem;
   color: var(--color-muted);
 }
 
 .primary-button {
   align-self: flex-start;
-  min-height: 84px;
-  padding: 0 46px;
+  min-height: 88px;
+  padding: 0 50px;
   border: 0;
   border-radius: 999px;
   background: var(--gradient-brand);
   color: white;
-  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-size: 1.28rem;
   font-weight: 900;
   box-shadow: 0 20px 46px rgba(0, 167, 200, 0.3);
   transition: transform 180ms ease, box-shadow 180ms ease;
@@ -200,17 +200,17 @@ h3 {
 .option-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
+  gap: 24px;
 }
 
 .option-card {
-  min-height: 132px;
-  padding: 26px;
+  min-height: 138px;
+  padding: 28px;
   border: 1px solid var(--color-line);
   border-radius: 24px;
   background: var(--color-surface);
   color: var(--color-primary);
-  font-size: clamp(1.35rem, 2.6vw, 2.15rem);
+  font-size: 1.75rem;
   font-weight: 850;
   text-align: left;
   box-shadow: var(--shadow-soft);
@@ -238,7 +238,7 @@ h3 {
 .analysis-panel,
 .lead-form,
 .dashboard-grid > div {
-  padding: clamp(24px, 4vw, 46px);
+  padding: 42px;
 }
 
 .metric-row {
@@ -253,7 +253,7 @@ h3 {
   gap: 16px;
   color: var(--color-primary);
   font-weight: 900;
-  font-size: clamp(1rem, 1.6vw, 1.35rem);
+  font-size: 1.2rem;
 }
 
 .progress-track {
@@ -277,7 +277,7 @@ h3 {
 
 .status-message {
   color: var(--color-secondary);
-  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-size: 2rem;
   font-weight: 850;
 }
 
@@ -344,14 +344,14 @@ h3 {
 
 .summary {
   color: var(--color-muted);
-  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  font-size: 1.35rem;
   line-height: 1.35;
 }
 
 .insight-stack article {
   padding: 24px;
   color: var(--color-primary);
-  font-size: clamp(1.05rem, 1.8vw, 1.42rem);
+  font-size: 1.22rem;
   font-weight: 750;
 }
 
@@ -371,7 +371,7 @@ h3 {
 
 .ideas p {
   color: var(--color-muted);
-  font-size: clamp(1rem, 1.8vw, 1.35rem);
+  font-size: 1.18rem;
 }
 
 .lead-form {
@@ -459,21 +459,21 @@ h3 {
 .dashboard-page {
   position: relative;
   z-index: 1;
-  min-height: 100vh;
+  min-height: 100svh;
   width: min(100%, 1600px);
   margin: 0 auto;
-  padding: clamp(36px, 5vw, 86px);
+  padding: 72px;
 }
 
 .dashboard-page h1 {
-  font-size: clamp(3rem, 6.5vw, 7rem);
+  font-size: 5.8rem;
   max-width: 1200px;
 }
 
 .dashboard-page h2 {
   margin-top: 8px;
   color: var(--color-secondary);
-  font-size: clamp(1.6rem, 3vw, 3rem);
+  font-size: 2.45rem;
 }
 
 .dashboard-number {
@@ -484,14 +484,14 @@ h3 {
 }
 
 .dashboard-number strong {
-  font-size: clamp(5rem, 11vw, 11rem);
+  font-size: 9rem;
   line-height: 0.88;
   color: var(--color-primary);
 }
 
 .dashboard-number span {
   color: var(--color-muted);
-  font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+  font-size: 2rem;
   font-weight: 800;
 }
 
@@ -523,6 +523,179 @@ h3 {
   font-weight: 800;
 }
 
+@media (orientation: portrait) and (min-width: 761px) {
+  .screen {
+    width: min(100%, 1080px);
+    min-height: 100svh;
+    padding: 92px 78px;
+    gap: 42px;
+  }
+
+  .start-screen {
+    justify-content: center;
+    padding-top: 170px;
+    padding-bottom: 150px;
+  }
+
+  .start-screen .primary-button {
+    margin-top: 22px;
+  }
+
+  .question-screen {
+    justify-content: flex-start;
+    padding-top: 150px;
+  }
+
+  .question-screen h2 {
+    min-height: 2.15em;
+  }
+
+  .option-grid {
+    gap: 26px;
+  }
+
+  .option-card {
+    min-height: 158px;
+    padding: 32px;
+    font-size: 1.95rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .analysis-screen {
+    padding-top: 170px;
+  }
+
+  .result-screen {
+    justify-content: flex-start;
+    gap: 30px;
+    padding-top: 82px;
+  }
+
+  .result-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .score-panel {
+    min-height: 420px;
+  }
+
+  .radar {
+    width: 470px;
+  }
+
+  .insight-stack {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .summary {
+    grid-column: 1 / -1;
+    font-size: 1.32rem;
+  }
+
+  .insight-stack article {
+    min-height: 156px;
+    padding: 22px;
+    font-size: 1.08rem;
+  }
+
+  .ideas {
+    padding: 24px;
+    gap: 10px;
+  }
+
+  .ideas p {
+    font-size: 1.08rem;
+  }
+
+  .lead-screen {
+    justify-content: flex-start;
+    padding-top: 90px;
+  }
+
+  .lead-form input {
+    min-height: 82px;
+    font-size: 1.25rem;
+  }
+
+  .dashboard-page {
+    width: min(100%, 1080px);
+    padding: 86px 78px;
+  }
+
+  .dashboard-page h1 {
+    font-size: 5.9rem;
+    line-height: 0.95;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (orientation: landscape) and (min-width: 900px) {
+  .screen {
+    width: min(100%, 1280px);
+    padding: 58px 74px;
+    gap: 28px;
+  }
+
+  .start-screen {
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr;
+    align-content: center;
+    align-items: end;
+  }
+
+  .start-screen .brand-mark {
+    grid-column: 1 / -1;
+  }
+
+  h1 {
+    font-size: 5.15rem;
+    max-width: 760px;
+  }
+
+  h2 {
+    font-size: 3.15rem;
+  }
+
+  .hero-copy p:last-child,
+  .final-screen > p:not(.eyebrow) {
+    font-size: 1.65rem;
+  }
+
+  .primary-button {
+    min-height: 76px;
+    padding: 0 38px;
+  }
+
+  .question-screen {
+    justify-content: center;
+  }
+
+  .option-card {
+    min-height: 112px;
+    font-size: 1.38rem;
+  }
+
+  .analysis-panel,
+  .lead-form,
+  .dashboard-grid > div {
+    padding: 30px;
+  }
+
+  .radar {
+    width: 360px;
+  }
+
+  .dashboard-page {
+    padding: 56px 74px;
+  }
+}
+
 @media (max-width: 760px) {
   .screen {
     padding: 28px;
@@ -550,5 +723,78 @@ h3 {
   .primary-button {
     width: 100%;
     min-height: 72px;
+  }
+
+  h1 {
+    font-size: 3.4rem;
+  }
+
+  h2 {
+    font-size: 2.35rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+  }
+
+  .hero-copy p:last-child,
+  .final-screen > p:not(.eyebrow) {
+    font-size: 1.35rem;
+  }
+
+  .eyebrow,
+  .metric-top,
+  .ideas p,
+  .summary {
+    font-size: 1rem;
+  }
+
+  .option-card {
+    min-height: 92px;
+    font-size: 1.2rem;
+    padding: 20px;
+  }
+
+  .analysis-panel,
+  .lead-form,
+  .dashboard-grid > div {
+    padding: 22px;
+  }
+
+  .result-screen {
+    justify-content: flex-start;
+  }
+
+  .radar {
+    width: min(100%, 320px);
+  }
+
+  .score-badge {
+    width: 108px;
+    height: 108px;
+  }
+
+  .score-badge strong {
+    font-size: 2.25rem;
+  }
+
+  .dashboard-page {
+    padding: 28px;
+  }
+
+  .dashboard-page h1 {
+    font-size: 3rem;
+  }
+
+  .dashboard-page h2 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-number strong {
+    font-size: 5rem;
+  }
+
+  .dashboard-number span {
+    font-size: 1.25rem;
   }
 }
