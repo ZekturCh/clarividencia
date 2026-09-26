@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 export function WaveTransition({
   active,
   message,
@@ -5,9 +7,32 @@ export function WaveTransition({
   active: boolean;
   message: string;
 }) {
+  const wavePixels = Array.from({ length: 132 }, (_, index) => {
+    const column = index % 22;
+    const row = Math.floor(index / 22);
+    const drift = ((index * 17) % 11) - 5;
+    const size = 10 + ((index * 7) % 22);
+
+    return {
+      id: index,
+      style: {
+        '--x': `${column * 4.7 + drift}%`,
+        '--y': `${row * 17 + ((index * 13) % 9)}%`,
+        '--size': `${size}px`,
+        '--delay': `${column * 42 + row * 24}ms`,
+      } as CSSProperties,
+    };
+  });
+
   return (
     <div className={active ? 'wave-transition active' : 'wave-transition'} aria-hidden={!active}>
       <div className="wave-surface" />
+      <div className="digital-sweep" />
+      <div className="pixel-wave">
+        {wavePixels.map((pixel) => (
+          <span key={pixel.id} style={pixel.style} />
+        ))}
+      </div>
       <div className="pixel-field">
         {Array.from({ length: 36 }, (_, index) => (
           <span key={index} />
