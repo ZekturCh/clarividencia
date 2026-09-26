@@ -43,7 +43,7 @@ function App() {
   const [answers, setAnswers] = useState<Answers>({});
   const [insight, setInsight] = useState<AIInsight | null>(null);
   const [activeSession, setActiveSession] = useState<SessionRecord | null>(null);
-  const [transition, setTransition] = useState({ active: false, message: transitionMessages[0] });
+  const [transition, setTransition] = useState({ active: false, message: transitionMessages[0], runId: 0 });
 
   const scores = useMemo(() => calculateScores(answers), [answers]);
   const totalScore = useMemo(() => calculateTotalScore(scores), [scores]);
@@ -54,7 +54,7 @@ function App() {
     setAnswers({});
     setInsight(null);
     setActiveSession(null);
-    setTransition({ active: false, message: transitionMessages[0] });
+    setTransition({ active: false, message: transitionMessages[0], runId: 0 });
   }, []);
 
   useIdleReset(restart);
@@ -94,7 +94,7 @@ function App() {
 
     const nextMessage = transitionMessages[questionIndex % transitionMessages.length];
     setAnswers((current) => ({ ...current, [questionId]: optionId }));
-    setTransition({ active: true, message: nextMessage });
+    setTransition((current) => ({ active: true, message: nextMessage, runId: current.runId + 1 }));
 
     window.setTimeout(() => {
       if (questionIndex === questions.length - 1) {
@@ -132,7 +132,7 @@ function App() {
     <AppShell>
       {step === 'start' && <StartScreen onStart={() => setStep('questions')} />}
       {step === 'questions' && (
-        <QuestionScreen key={questionIndex} index={questionIndex} answers={answers} onAnswer={answerQuestion} />
+        <QuestionScreen key={`question-${questionIndex}`} index={questionIndex} answers={answers} onAnswer={answerQuestion} />
       )}
       {step === 'analysis' && <AnalysisScreen scores={scores} />}
       {step === 'result' && insight && (
@@ -145,7 +145,7 @@ function App() {
       )}
       {step === 'lead' && <LeadScreen onSubmit={submitLead} />}
       {step === 'final' && <FinalScreen stats={storageProvider.getAggregateStats()} onRestart={restart} />}
-      <WaveTransition active={transition.active} message={transition.message} />
+      <WaveTransition key={`transition-${transition.runId}`} active={transition.active} message={transition.message} />
       <DevTools />
     </AppShell>
   );

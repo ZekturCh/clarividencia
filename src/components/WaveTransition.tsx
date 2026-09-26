@@ -39,23 +39,9 @@ export function WaveTransition({
         ))}
       </div>
       <div className="ai-loader-grid" />
-      <div className="transition-copy">
-        <span className="loader-kicker">ClarividencIA / motor local</span>
-        <div className="loader-core" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <i />
-        </div>
+      <div className="transition-hud">
+        <span>ClarividencIA</span>
         <strong>{message}</strong>
-        <div className="loader-progress" aria-hidden="true">
-          <span />
-        </div>
-        <div className="loader-telemetry" aria-hidden="true">
-          <small>Analizando patrones</small>
-          <small>Leyendo opciones</small>
-          <small>Preparando siguiente pulso</small>
-        </div>
       </div>
     </div>
   );
