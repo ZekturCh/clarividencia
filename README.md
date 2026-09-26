@@ -13,6 +13,22 @@ Abrir la experiencia principal en `http://localhost:5173/`.
 
 Abrir el dashboard en `http://localhost:5173/dashboard`.
 
+## GitHub Pages
+
+La demo publicada vive en `demo/`, como archivos estáticos commiteados en este mismo repositorio.
+
+```bash
+npm run build:pages
+```
+
+Después de commitear y subir, GitHub Pages puede servir:
+
+- `https://zekturch.github.io/clarividencia/`
+- `https://zekturch.github.io/clarividencia/demo/`
+- `https://zekturch.github.io/clarividencia/demo/dashboard`
+
+No usa backend, Firebase, OpenAI, GitHub Actions obligatorio ni servicios externos. Es una demo local/static.
+
 ## Estructura
 
 - `src/components`: piezas reutilizables de UI.
