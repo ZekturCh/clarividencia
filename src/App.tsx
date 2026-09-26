@@ -19,7 +19,7 @@ import { createId } from './utils/ids';
 type FlowStep = 'start' | 'questions' | 'analysis' | 'result' | 'lead' | 'final';
 
 function App() {
-  const isDashboard = window.location.pathname === '/dashboard' && ENABLE_DASHBOARD;
+  const isDashboard = window.location.pathname.endsWith('/dashboard') && ENABLE_DASHBOARD;
   const { aiProvider, storageProvider } = useAppServices();
   const [step, setStep] = useState<FlowStep>('start');
   const [questionIndex, setQuestionIndex] = useState(0);
