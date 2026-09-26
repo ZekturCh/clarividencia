@@ -3,7 +3,13 @@ import { ProgressBar } from '../components/ProgressBar';
 import { dimensionLabels, radarDimensions } from '../data/scoringRules';
 import type { Scores } from '../types';
 
-const messages = ['Identificando patrones...', 'Comparando prioridades...', 'Generando ideas para tu organización...'];
+const messages = [
+  'ClarividencIA está actuando para ti...',
+  'Leyendo opciones seleccionadas...',
+  'Analizando propuesta cultural...',
+  'Comparando señales de equipo...',
+  'Generando ideas para tu organización...',
+];
 
 export function AnalysisScreen({ scores }: { scores: Scores }) {
   const [messageIndex, setMessageIndex] = useState(0);
@@ -17,8 +23,13 @@ export function AnalysisScreen({ scores }: { scores: Scores }) {
 
   return (
     <section className="screen analysis-screen">
-      <p className="eyebrow">Análisis con IA</p>
+      <p className="eyebrow">ClarividencIA</p>
       <h2>Estamos leyendo el pulso de tu organización</h2>
+      <div className="ai-thinking-core" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
       <div className="analysis-panel">
         {radarDimensions.map((dimension) => (
           <ProgressBar key={dimension} label={dimensionLabels[dimension].toUpperCase()} value={scores[dimension]} />

@@ -1,7 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AmbientLines } from './components/AmbientLines';
 import { DevTools } from './components/DevTools';
-import { FINAL_IDLE_TIMEOUT, ANALYSIS_DURATION, ENABLE_DASHBOARD, ENABLE_LEAD_FORM } from './config';
+import { WaveTransition } from './components/WaveTransition';
+import {
+  ANALYSIS_MAX_DURATION,
+  ANALYSIS_MIN_DURATION,
+  ENABLE_DASHBOARD,
+  ENABLE_LEAD_FORM,
+  FINAL_IDLE_TIMEOUT,
+  QUESTION_TRANSITION_DURATION,
+  QUESTION_TRANSITION_SWAP_AT,
+} from './config';
 import { useAppServices } from './context/AppServicesContext';
 import { questions } from './data/questions';
 import { useIdleReset } from './hooks/useIdleReset';
@@ -15,8 +24,16 @@ import { ResultScreen } from './screens/ResultScreen';
 import { StartScreen } from './screens/StartScreen';
 import type { AIInsight, Answers, SessionRecord } from './types';
 import { createId } from './utils/ids';
+import { getVariableDelay } from './utils/timing';
 
 type FlowStep = 'start' | 'questions' | 'analysis' | 'result' | 'lead' | 'final';
+
+const transitionMessages = [
+  'Leyendo opciones',
+  'Analizando propuesta',
+  'Conectando señales culturales',
+  'ClarividencIA está actuando para ti',
+];
 
 function App() {
   const isDashboard = window.location.pathname.endsWith('/dashboard') && ENABLE_DASHBOARD;
@@ -26,6 +43,7 @@ function App() {
   const [answers, setAnswers] = useState<Answers>({});
   const [insight, setInsight] = useState<AIInsight | null>(null);
   const [activeSession, setActiveSession] = useState<SessionRecord | null>(null);
+  const [transition, setTransition] = useState({ active: false, message: transitionMessages[0] });
 
   const scores = useMemo(() => calculateScores(answers), [answers]);
   const totalScore = useMemo(() => calculateTotalScore(scores), [scores]);
@@ -36,6 +54,7 @@ function App() {
     setAnswers({});
     setInsight(null);
     setActiveSession(null);
+    setTransition({ active: false, message: transitionMessages[0] });
   }, []);
 
   useIdleReset(restart);
@@ -43,6 +62,7 @@ function App() {
   useEffect(() => {
     if (step !== 'analysis') return;
 
+    const thinkingDelay = getVariableDelay(ANALYSIS_MIN_DURATION, ANALYSIS_MAX_DURATION);
     const timer = window.setTimeout(async () => {
       const analysis = await aiProvider.analyze({ scores, answers });
       const session: SessionRecord = {
@@ -58,7 +78,7 @@ function App() {
       setInsight(analysis);
       setActiveSession(session);
       setStep('result');
-    }, ANALYSIS_DURATION);
+    }, thinkingDelay);
 
     return () => window.clearTimeout(timer);
   }, [aiProvider, answers, scores, step, storageProvider, totalScore]);
@@ -70,12 +90,23 @@ function App() {
   }, [restart, step]);
 
   const answerQuestion = (questionId: keyof Answers, optionId: string) => {
+    if (transition.active) return;
+
+    const nextMessage = transitionMessages[questionIndex % transitionMessages.length];
     setAnswers((current) => ({ ...current, [questionId]: optionId }));
-    if (questionIndex === questions.length - 1) {
-      setStep('analysis');
-      return;
-    }
-    setQuestionIndex((current) => current + 1);
+    setTransition({ active: true, message: nextMessage });
+
+    window.setTimeout(() => {
+      if (questionIndex === questions.length - 1) {
+        setStep('analysis');
+        return;
+      }
+      setQuestionIndex((current) => current + 1);
+    }, QUESTION_TRANSITION_SWAP_AT);
+
+    window.setTimeout(() => {
+      setTransition((current) => ({ ...current, active: false }));
+    }, QUESTION_TRANSITION_DURATION);
   };
 
   const submitLead = (values: LeadFormValues) => {
@@ -100,7 +131,9 @@ function App() {
   return (
     <AppShell>
       {step === 'start' && <StartScreen onStart={() => setStep('questions')} />}
-      {step === 'questions' && <QuestionScreen index={questionIndex} answers={answers} onAnswer={answerQuestion} />}
+      {step === 'questions' && (
+        <QuestionScreen key={questionIndex} index={questionIndex} answers={answers} onAnswer={answerQuestion} />
+      )}
       {step === 'analysis' && <AnalysisScreen scores={scores} />}
       {step === 'result' && insight && (
         <ResultScreen
@@ -112,6 +145,7 @@ function App() {
       )}
       {step === 'lead' && <LeadScreen onSubmit={submitLead} />}
       {step === 'final' && <FinalScreen stats={storageProvider.getAggregateStats()} onRestart={restart} />}
+      <WaveTransition active={transition.active} message={transition.message} />
       <DevTools />
     </AppShell>
   );
