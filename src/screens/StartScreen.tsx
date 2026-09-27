@@ -1,4 +1,5 @@
 import { BrandMark } from '../components/BrandMark';
+import symbol from '../assets/brand/clarividencia-symbol.png';
 
 export function StartScreen({ onStart }: { onStart: () => void }) {
   return (
@@ -12,6 +13,9 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
       <button className="primary-button" onClick={onStart}>
         COMENZAR
       </button>
+      <div className="brand-hero-graphic" aria-hidden="true">
+        <img src={symbol} alt="" />
+      </div>
     </section>
   );
 }

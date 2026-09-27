@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import symbol from '../assets/brand/clarividencia-symbol.png';
 
 export function WaveTransition({
   active,
@@ -33,6 +34,7 @@ export function WaveTransition({
           <span key={pixel.id} style={pixel.style} />
         ))}
       </div>
+      <img className="transition-brand-symbol" src={symbol} alt="" />
     </div>
   );
 }
