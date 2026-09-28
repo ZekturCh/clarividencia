@@ -10,8 +10,6 @@ import {
   FINAL_IDLE_TIMEOUT,
   QUESTION_DIAGNOSTIC_MAX_DURATION,
   QUESTION_DIAGNOSTIC_MIN_DURATION,
-  QUESTION_TRANSITION_DURATION,
-  QUESTION_TRANSITION_SWAP_AT,
 } from './config';
 import { useAppServices } from './context/AppServicesContext';
 import { questions } from './data/questions';
@@ -45,7 +43,12 @@ function App() {
   const [answers, setAnswers] = useState<Answers>({});
   const [insight, setInsight] = useState<AIInsight | null>(null);
   const [activeSession, setActiveSession] = useState<SessionRecord | null>(null);
-  const [transition, setTransition] = useState({ active: false, message: transitionMessages[0], runId: 0 });
+  const [transition, setTransition] = useState({
+    active: false,
+    durationMs: QUESTION_DIAGNOSTIC_MIN_DURATION,
+    message: transitionMessages[0],
+    runId: 0,
+  });
   const [isQuestionAdvancing, setIsQuestionAdvancing] = useState(false);
   const questionTimers = useRef<number[]>([]);
 
@@ -74,7 +77,12 @@ function App() {
     setInsight(null);
     setActiveSession(null);
     setIsQuestionAdvancing(false);
-    setTransition({ active: false, message: transitionMessages[0], runId: 0 });
+    setTransition({
+      active: false,
+      durationMs: QUESTION_DIAGNOSTIC_MIN_DURATION,
+      message: transitionMessages[0],
+      runId: 0,
+    });
   }, [clearQuestionTimers]);
 
   useIdleReset(restart);
@@ -115,26 +123,29 @@ function App() {
     if (transition.active || isQuestionAdvancing) return;
 
     const nextMessage = transitionMessages[questionIndex % transitionMessages.length];
-    const diagnosticDelay = getVariableDelay(QUESTION_DIAGNOSTIC_MIN_DURATION, QUESTION_DIAGNOSTIC_MAX_DURATION);
+    const diagnosticDuration = getVariableDelay(QUESTION_DIAGNOSTIC_MIN_DURATION, QUESTION_DIAGNOSTIC_MAX_DURATION);
+    const swapAt = Math.round(diagnosticDuration * 0.52);
     setAnswers((current) => ({ ...current, [questionId]: optionId }));
     setIsQuestionAdvancing(true);
+    setTransition((current) => ({
+      active: true,
+      durationMs: diagnosticDuration,
+      message: nextMessage,
+      runId: current.runId + 1,
+    }));
 
     scheduleQuestionTimer(() => {
-      setTransition((current) => ({ active: true, message: nextMessage, runId: current.runId + 1 }));
+      if (questionIndex === questions.length - 1) {
+        setStep('analysis');
+        return;
+      }
+      setQuestionIndex((current) => current + 1);
+    }, swapAt);
 
-      scheduleQuestionTimer(() => {
-        if (questionIndex === questions.length - 1) {
-          setStep('analysis');
-          return;
-        }
-        setQuestionIndex((current) => current + 1);
-      }, QUESTION_TRANSITION_SWAP_AT);
-
-      scheduleQuestionTimer(() => {
-        setTransition((current) => ({ ...current, active: false }));
-        setIsQuestionAdvancing(false);
-      }, QUESTION_TRANSITION_DURATION);
-    }, diagnosticDelay);
+    scheduleQuestionTimer(() => {
+      setTransition((current) => ({ ...current, active: false }));
+      setIsQuestionAdvancing(false);
+    }, diagnosticDuration);
   };
 
   const submitLead = (values: LeadFormValues) => {
@@ -173,7 +184,12 @@ function App() {
       )}
       {step === 'lead' && <LeadScreen onSubmit={submitLead} />}
       {step === 'final' && <FinalScreen stats={storageProvider.getAggregateStats()} onRestart={restart} />}
-      <WaveTransition key={`transition-${transition.runId}`} active={transition.active} message={transition.message} />
+      <WaveTransition
+        key={`transition-${transition.runId}`}
+        active={transition.active}
+        durationMs={transition.durationMs}
+        message={transition.message}
+      />
       <DevTools />
     </AppShell>
   );

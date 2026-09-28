@@ -1643,7 +1643,7 @@ h3 {
 .wave-transition.active {
   visibility: visible;
   pointer-events: auto;
-  animation: question-sequence-shell 2800ms linear both;
+  animation: question-sequence-shell var(--question-transition-duration, 2800ms) linear both;
 }
 
 .wave-transition .wave-surface {
@@ -1657,7 +1657,7 @@ h3 {
     linear-gradient(128deg, rgba(var(--brand-rgb-primary), 0.98) 0%, rgba(var(--brand-rgb-accent), 0.94) 46%, rgba(var(--brand-rgb-accent), 0.94) 58%, rgba(var(--brand-rgb-primary), 0.99) 100%);
   filter: saturate(1.18) contrast(1.08);
   transform: translate3d(-10%, 0, 0) skewX(-8deg);
-  animation: question-sequence-surface 2800ms cubic-bezier(0.72, 0, 0.18, 1) both;
+  animation: question-sequence-surface var(--question-transition-duration, 2800ms) cubic-bezier(0.72, 0, 0.18, 1) both;
 }
 
 .wave-transition .wave-surface::before {
@@ -1674,7 +1674,9 @@ h3 {
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 22px);
   mix-blend-mode: screen;
   opacity: 0;
-  animation: question-sequence-grid 2800ms ease both;
+  animation:
+    question-sequence-grid var(--question-transition-duration, 2800ms) ease both,
+    processing-grid-drift 1100ms linear infinite;
 }
 
 .wave-transition .digital-sweep {
@@ -1689,7 +1691,26 @@ h3 {
   filter: blur(0.5px);
   mix-blend-mode: screen;
   transform: translate3d(-82%, 0, 0) skewX(-11deg);
-  animation: question-sequence-sweep 2800ms cubic-bezier(0.2, 0.72, 0.16, 1) both;
+  animation: question-sequence-sweep var(--question-transition-duration, 2800ms) cubic-bezier(0.2, 0.72, 0.16, 1) both;
+}
+
+.wave-transition .processing-scan {
+  position: absolute;
+  inset: -20%;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(118deg, transparent 22%, rgba(255, 255, 255, 0.32) 32%, transparent 43%) -45% 0 / 42% 100% no-repeat,
+    linear-gradient(118deg, transparent 44%, rgba(var(--brand-rgb-accent), 0.24) 50%, transparent 58%) -64% 0 / 36% 100% no-repeat,
+    radial-gradient(circle at 22% 34%, rgba(255, 255, 255, 0.2), transparent 16rem),
+    radial-gradient(circle at 72% 68%, rgba(var(--brand-rgb-accent), 0.2), transparent 18rem);
+  filter: blur(0.4px);
+  mix-blend-mode: screen;
+  transform: skewX(-10deg);
+  animation:
+    processing-scan-visibility var(--question-transition-duration, 2800ms) ease both,
+    processing-scan-loop 1180ms linear infinite;
 }
 
 .wave-transition .pixel-wave {
@@ -1803,6 +1824,15 @@ h3 {
   }
 }
 
+@keyframes processing-grid-drift {
+  0% {
+    background-position: -35% 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 135% 0, 18px 22px, 22px 18px;
+  }
+}
+
 @keyframes question-sequence-sweep {
   0% {
     opacity: 0;
@@ -1822,6 +1852,29 @@ h3 {
   100% {
     opacity: 0;
     transform: translate3d(92%, -8%, 0) skewX(-11deg);
+  }
+}
+
+@keyframes processing-scan-visibility {
+  0%,
+  10% {
+    opacity: 0;
+  }
+  24%,
+  78% {
+    opacity: 0.82;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes processing-scan-loop {
+  0% {
+    background-position: -45% 0, -64% 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 132% 0, 118% 0, 0 0, 0 0;
   }
 }
 
@@ -2430,7 +2483,7 @@ h2 {
   width: min(78vw, 960px);
   opacity: 0;
   filter: none;
-  animation: brand-symbol-trace 2800ms ease both;
+  animation: brand-symbol-trace var(--question-transition-duration, 2800ms) ease both;
 }
 
 .transition-line-symbol-one {
@@ -2454,7 +2507,7 @@ h2 {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.78);
   filter: none;
-  animation: brand-symbol-center 2800ms ease both;
+  animation: brand-symbol-center var(--question-transition-duration, 2800ms) ease both;
 }
 
 @keyframes brand-symbol-trace {
