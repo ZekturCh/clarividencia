@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AmbientLines } from './components/AmbientLines';
 import { DevTools } from './components/DevTools';
 import { WaveTransition } from './components/WaveTransition';
@@ -8,6 +8,8 @@ import {
   ENABLE_DASHBOARD,
   ENABLE_LEAD_FORM,
   FINAL_IDLE_TIMEOUT,
+  QUESTION_DIAGNOSTIC_MAX_DURATION,
+  QUESTION_DIAGNOSTIC_MIN_DURATION,
   QUESTION_TRANSITION_DURATION,
   QUESTION_TRANSITION_SWAP_AT,
 } from './config';
@@ -44,20 +46,40 @@ function App() {
   const [insight, setInsight] = useState<AIInsight | null>(null);
   const [activeSession, setActiveSession] = useState<SessionRecord | null>(null);
   const [transition, setTransition] = useState({ active: false, message: transitionMessages[0], runId: 0 });
+  const [isQuestionAdvancing, setIsQuestionAdvancing] = useState(false);
+  const questionTimers = useRef<number[]>([]);
 
   const scores = useMemo(() => calculateScores(answers), [answers]);
   const totalScore = useMemo(() => calculateTotalScore(scores), [scores]);
 
+  const clearQuestionTimers = useCallback(() => {
+    questionTimers.current.forEach((timer) => window.clearTimeout(timer));
+    questionTimers.current = [];
+  }, []);
+
+  const scheduleQuestionTimer = useCallback((callback: () => void, delay: number) => {
+    const timer = window.setTimeout(() => {
+      questionTimers.current = questionTimers.current.filter((currentTimer) => currentTimer !== timer);
+      callback();
+    }, delay);
+
+    questionTimers.current.push(timer);
+  }, []);
+
   const restart = useCallback(() => {
+    clearQuestionTimers();
     setStep('start');
     setQuestionIndex(0);
     setAnswers({});
     setInsight(null);
     setActiveSession(null);
+    setIsQuestionAdvancing(false);
     setTransition({ active: false, message: transitionMessages[0], runId: 0 });
-  }, []);
+  }, [clearQuestionTimers]);
 
   useIdleReset(restart);
+
+  useEffect(() => clearQuestionTimers, [clearQuestionTimers]);
 
   useEffect(() => {
     if (step !== 'analysis') return;
@@ -90,23 +112,29 @@ function App() {
   }, [restart, step]);
 
   const answerQuestion = (questionId: keyof Answers, optionId: string) => {
-    if (transition.active) return;
+    if (transition.active || isQuestionAdvancing) return;
 
     const nextMessage = transitionMessages[questionIndex % transitionMessages.length];
+    const diagnosticDelay = getVariableDelay(QUESTION_DIAGNOSTIC_MIN_DURATION, QUESTION_DIAGNOSTIC_MAX_DURATION);
     setAnswers((current) => ({ ...current, [questionId]: optionId }));
-    setTransition((current) => ({ active: true, message: nextMessage, runId: current.runId + 1 }));
+    setIsQuestionAdvancing(true);
 
-    window.setTimeout(() => {
-      if (questionIndex === questions.length - 1) {
-        setStep('analysis');
-        return;
-      }
-      setQuestionIndex((current) => current + 1);
-    }, QUESTION_TRANSITION_SWAP_AT);
+    scheduleQuestionTimer(() => {
+      setTransition((current) => ({ active: true, message: nextMessage, runId: current.runId + 1 }));
 
-    window.setTimeout(() => {
-      setTransition((current) => ({ ...current, active: false }));
-    }, QUESTION_TRANSITION_DURATION);
+      scheduleQuestionTimer(() => {
+        if (questionIndex === questions.length - 1) {
+          setStep('analysis');
+          return;
+        }
+        setQuestionIndex((current) => current + 1);
+      }, QUESTION_TRANSITION_SWAP_AT);
+
+      scheduleQuestionTimer(() => {
+        setTransition((current) => ({ ...current, active: false }));
+        setIsQuestionAdvancing(false);
+      }, QUESTION_TRANSITION_DURATION);
+    }, diagnosticDelay);
   };
 
   const submitLead = (values: LeadFormValues) => {
