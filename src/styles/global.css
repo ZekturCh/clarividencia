@@ -291,18 +291,37 @@ h3 {
   from { width: 0; }
 }
 
+.ai-thinking-stage {
+  position: relative;
+  width: min(100%, 420px);
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+}
+
 .status-message {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(82vw, 620px);
+  margin: 0;
   color: var(--color-secondary);
-  font-size: 2rem;
+  font-size: clamp(1.35rem, 3.2vw, 2.35rem);
   font-weight: 850;
+  line-height: 1.12;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: thinking-caption 1500ms ease both;
 }
 
 .ai-thinking-core {
   position: relative;
   width: min(100%, 420px);
-  height: 96px;
+  height: 120px;
   display: grid;
   place-items: center;
+  opacity: 0.42;
 }
 
 .ai-thinking-core span {
@@ -1835,6 +1854,25 @@ h3 {
   100% {
     opacity: 0;
     background-position: 135% 0, 0 0, 0 0;
+  }
+}
+
+@keyframes thinking-caption {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 10px));
+    filter: blur(8px);
+  }
+  22%,
+  76% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% - 8px));
+    filter: blur(7px);
   }
 }
 
