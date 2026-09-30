@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import QRCode from 'qrcode';
 import { EVENT_NAME, EVENT_YEAR, STORAGE_EVENT_NAME } from '../config';
 import { ProgressBar } from '../components/ProgressBar';
 import { questions } from '../data/questions';
@@ -140,16 +141,24 @@ export function DashboardScreen() {
           <div className="records-table leads-table">
             {latestLeads.length ? (
               latestLeads.map((lead) => (
-                <article key={lead.id} className="record-row">
-                  <div>
-                    <strong>{lead.fullName}</strong>
-                    <span>{lead.company || 'Sin empresa'} · {lead.role || 'Sin cargo'}</span>
+                <article key={lead.id} className="record-row lead-record-row">
+                  <LeadQr lead={lead} />
+                  <div className="lead-data-block">
+                    <span>Nombre</span>
+                    <strong>{lead.fullName || 'Sin nombre'}</strong>
                   </div>
-                  <div>
-                    <a href={`mailto:${lead.email}`}>{lead.email}</a>
-                    <span>{lead.whatsapp || 'Sin WhatsApp'}</span>
+                  <div className="lead-data-block">
+                    <span>Empresa / cargo</span>
+                    <strong>{lead.company || 'Sin empresa'}</strong>
+                    <small>{lead.role || 'Sin cargo'}</small>
                   </div>
-                  <div>
+                  <div className="lead-data-block">
+                    <span>Contacto</span>
+                    <a href={`mailto:${lead.email}`}>{lead.email || 'Sin correo'}</a>
+                    <a href={buildWhatsAppUrl(lead)} target="_blank" rel="noreferrer">{lead.whatsapp || 'Sin WhatsApp'}</a>
+                  </div>
+                  <div className="lead-data-block">
+                    <span>Intereses</span>
                     <small>{lead.interests?.length ? lead.interests.join(', ') : 'Sin intereses marcados'}</small>
                     <time>{formatDate(lead.createdAt)}</time>
                   </div>
@@ -190,6 +199,37 @@ export function DashboardScreen() {
         </div>
       </section>
     </main>
+  );
+}
+
+function LeadQr({ lead }: { lead: LeadRecord }) {
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  const qrPayload = buildWhatsAppUrl(lead);
+
+  useEffect(() => {
+    let active = true;
+    void QRCode.toDataURL(qrPayload, {
+      color: {
+        dark: '#000f46',
+        light: '#ffffff',
+      },
+      errorCorrectionLevel: 'M',
+      margin: 1,
+      width: 116,
+    }).then((dataUrl) => {
+      if (active) setQrDataUrl(dataUrl);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [qrPayload]);
+
+  return (
+    <a className="lead-qr" href={qrPayload} target="_blank" rel="noreferrer" aria-label={`Abrir WhatsApp de ${lead.fullName || 'registro'}`}>
+      {qrDataUrl ? <img src={qrDataUrl} alt="" /> : <span />}
+      <small>Expediente</small>
+    </a>
   );
 }
 
@@ -262,4 +302,14 @@ function formatDate(value: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+function buildWhatsAppUrl(lead: LeadRecord) {
+  const phone = lead.whatsapp?.replace(/\D/g, '') ?? '';
+  const message = encodeURIComponent(
+    `Hola ${lead.fullName || ''}, aquí está tu expediente ClarividencIA de ${lead.company || 'tu organización'}.`,
+  );
+
+  if (!phone) return `https://wa.me/?text=${message}`;
+  return `https://wa.me/${phone}?text=${message}`;
 }

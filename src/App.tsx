@@ -196,10 +196,21 @@ function App() {
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
+  const activateFullscreen = () => {
+    if (document.fullscreenElement) return;
+    void document.documentElement.requestFullscreen?.();
+  };
+
   return (
     <main className="app-shell">
       <AmbientLines />
       {children}
+      <button
+        aria-label="Activar pantalla completa"
+        className="fullscreen-hotspot"
+        type="button"
+        onClick={activateFullscreen}
+      />
     </main>
   );
 }
