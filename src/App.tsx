@@ -173,7 +173,7 @@ function App() {
       {step === 'questions' && (
         <QuestionScreen key={`question-${questionIndex}`} index={questionIndex} answers={answers} onAnswer={answerQuestion} />
       )}
-      {step === 'analysis' && <AnalysisScreen scores={scores} />}
+      {step === 'analysis' && <AnalysisScreen answers={answers} scores={scores} />}
       {step === 'result' && insight && (
         <ResultScreen
           scores={scores}

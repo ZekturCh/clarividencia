@@ -1,6 +1,8 @@
 import { createContext, useContext } from 'react';
+import { ENABLE_REMOTE_STORAGE } from '../config';
 import { MockAIProvider } from '../providers/ai/MockAIProvider';
 import type { AIProvider } from '../providers/ai/AIProvider';
+import { FirebaseStorageProvider } from '../providers/storage/FirebaseStorageProvider';
 import { LocalStorageProvider } from '../providers/storage/LocalStorageProvider';
 import type { StorageProvider } from '../providers/storage/StorageProvider';
 
@@ -11,7 +13,7 @@ interface AppServices {
 
 const services: AppServices = {
   aiProvider: new MockAIProvider(),
-  storageProvider: new LocalStorageProvider(),
+  storageProvider: ENABLE_REMOTE_STORAGE ? new FirebaseStorageProvider() : new LocalStorageProvider(),
 };
 
 const AppServicesContext = createContext<AppServices>(services);

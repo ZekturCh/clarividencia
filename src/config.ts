@@ -13,6 +13,6 @@ export const QUESTION_TRANSITION_SWAP_AT = 1360;
 export const ENABLE_LEAD_FORM = true;
 export const ENABLE_DASHBOARD = true;
 export const ENABLE_REAL_AI = false;
-export const ENABLE_REMOTE_STORAGE = false;
+export const ENABLE_REMOTE_STORAGE = true;
 
 export const STORAGE_EVENT_NAME = 'culture-pulse-storage-updated';
