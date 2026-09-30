@@ -5,6 +5,8 @@ export interface StorageProvider {
   saveLead(lead: LeadRecord): void;
   getSessions(): SessionRecord[];
   getLeads(): LeadRecord[];
+  getRemoteSessions?(): Promise<SessionRecord[]>;
+  getRemoteLeads?(): Promise<LeadRecord[]>;
   getAggregateStats(): AggregateStats;
   clearData(): void;
 }

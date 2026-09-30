@@ -2578,3 +2578,226 @@ h2 {
     width: 86vw;
   }
 }
+
+/* Firestore registration dashboard */
+.dashboard-admin-page {
+  display: grid;
+  gap: 28px;
+}
+
+.dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  gap: 28px;
+  align-items: end;
+}
+
+.dashboard-source,
+.metric-card,
+.records-panel {
+  border: 1px solid rgba(var(--brand-rgb-primary), 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 252, 249, 0.88)),
+    var(--color-surface);
+  box-shadow: var(--shadow-crisp);
+}
+
+.dashboard-source {
+  min-height: 220px;
+  padding: 28px;
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-source::before,
+.metric-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(var(--brand-rgb-primary), 0.07) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(var(--brand-rgb-primary), 0.05) 0 1px, transparent 1px 100%);
+  background-size: 28px 28px;
+  opacity: 0.55;
+}
+
+.dashboard-source span,
+.metric-card span,
+.records-heading span {
+  color: var(--color-secondary);
+  font-size: 0.92rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.dashboard-source strong {
+  position: relative;
+  color: var(--color-primary);
+  font-size: clamp(4rem, 10vw, 7rem);
+  line-height: 0.88;
+}
+
+.dashboard-source small,
+.metric-card small,
+.record-row span,
+.record-row small,
+.record-row time {
+  color: var(--color-muted);
+  font-weight: 750;
+}
+
+.metric-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.metric-card {
+  position: relative;
+  min-height: 168px;
+  padding: 24px;
+  display: grid;
+  align-content: space-between;
+  overflow: hidden;
+}
+
+.metric-card strong {
+  position: relative;
+  color: var(--color-primary);
+  font-size: clamp(2.7rem, 5vw, 5rem);
+  line-height: 0.9;
+}
+
+.dashboard-records {
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.records-panel {
+  padding: 28px;
+}
+
+.records-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.records-table {
+  display: grid;
+  gap: 12px;
+}
+
+.record-row {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1.1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(var(--brand-rgb-primary), 0.09);
+  border-left: 5px solid rgba(var(--brand-rgb-accent), 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.record-row.compact {
+  grid-template-columns: 1fr auto;
+}
+
+.record-row div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.record-row strong,
+.record-row a {
+  color: var(--color-primary);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.record-row a {
+  text-decoration-color: rgba(var(--brand-rgb-accent), 0.9);
+}
+
+.record-row small,
+.record-row time {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.empty-state {
+  padding: 22px;
+  border: 1px dashed rgba(var(--brand-rgb-primary), 0.2);
+  border-radius: 8px;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+@media (orientation: portrait) and (min-width: 761px) {
+  .dashboard-hero,
+  .dashboard-records,
+  .metric-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-source {
+    min-height: 180px;
+  }
+
+  .record-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard-admin-page {
+    padding: 28px 20px;
+    gap: 18px;
+  }
+
+  .dashboard-page h1 {
+    font-size: clamp(2.6rem, 12vw, 3.4rem);
+  }
+
+  .dashboard-page h2 {
+    font-size: 1.45rem;
+  }
+
+  .dashboard-hero,
+  .dashboard-records,
+  .metric-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-source,
+  .metric-card,
+  .records-panel {
+    padding: 20px;
+  }
+
+  .dashboard-source {
+    min-height: 150px;
+  }
+
+  .records-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .record-row,
+  .record-row.compact {
+    grid-template-columns: 1fr;
+  }
+}

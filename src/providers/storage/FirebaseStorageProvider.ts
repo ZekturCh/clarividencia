@@ -27,16 +27,28 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
     super.saveLead(lead);
     void saveRemoteRecord('culturePulseLeads', lead.id, lead);
   }
+
+  async getRemoteSessions() {
+    return readRemoteCollection<SessionRecord>('culturePulseSessions');
+  }
+
+  async getRemoteLeads() {
+    return readRemoteCollection<LeadRecord>('culturePulseLeads');
+  }
+}
+
+async function getFirestoreDb() {
+  const [{ getApp, getApps, initializeApp }, { getFirestore }] = await Promise.all([
+    import('firebase/app'),
+    import('firebase/firestore'),
+  ]);
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  return getFirestore(app);
 }
 
 async function saveRemoteRecord(collectionName: string, id: string, payload: object) {
   try {
-    const [{ getApp, getApps, initializeApp }, { doc, getFirestore, serverTimestamp, setDoc }] = await Promise.all([
-      import('firebase/app'),
-      import('firebase/firestore'),
-    ]);
-    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const [{ doc, serverTimestamp, setDoc }, db] = await Promise.all([import('firebase/firestore'), getFirestoreDb()]);
 
     await setDoc(doc(db, collectionName, id), {
       ...payload,
@@ -46,6 +58,29 @@ async function saveRemoteRecord(collectionName: string, id: string, payload: obj
   } catch (error) {
     console.warn(`Could not save ${collectionName} record to Firestore`, error);
   }
+}
+
+async function readRemoteCollection<T extends { createdAt?: string }>(collectionName: string): Promise<T[]> {
+  try {
+    const [{ collection, getDocs, orderBy, query }, db] = await Promise.all([import('firebase/firestore'), getFirestoreDb()]);
+    const snapshot = await getDocs(query(collection(db, collectionName), orderBy('createdAt', 'desc')));
+
+    return snapshot.docs.map((item) => normalizeFirestoreRecord({ id: item.id, ...item.data() }) as T);
+  } catch (error) {
+    console.warn(`Could not read ${collectionName} records from Firestore`, error);
+    return [];
+  }
+}
+
+function normalizeFirestoreRecord(record: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(record).map(([key, value]) => {
+      if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
+        return [key, value.toDate().toISOString()];
+      }
+      return [key, value];
+    }),
+  );
 }
 
 function buildAnswerLabels(answers: Answers) {
