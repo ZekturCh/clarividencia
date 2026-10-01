@@ -1,7 +1,7 @@
 import { questions } from '../../data/questions';
 import type { Answers, LeadRecord, SessionRecord } from '../../types';
 import { LocalStorageProvider } from './LocalStorageProvider';
-import type { StorageProvider } from './StorageProvider';
+import type { RemoteSyncResult, StorageProvider } from './StorageProvider';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBiqqTAaogq4Pk1MaOUvr9YgXq2brqkzqU',
@@ -15,17 +15,17 @@ const firebaseConfig = {
 };
 
 export class FirebaseStorageProvider extends LocalStorageProvider implements StorageProvider {
-  saveSession(session: SessionRecord) {
+  async saveSession(session: SessionRecord) {
     super.saveSession(session);
-    void saveRemoteRecord('culturePulseSessions', session.id, {
+    return saveRemoteRecord('culturePulseSessions', session.id, {
       ...session,
       answerLabels: buildAnswerLabels(session.answers),
     });
   }
 
-  saveLead(lead: LeadRecord) {
+  async saveLead(lead: LeadRecord) {
     super.saveLead(lead);
-    void saveRemoteRecord('culturePulseLeads', lead.id, lead);
+    return saveRemoteRecord('culturePulseLeads', lead.id, lead);
   }
 
   async getRemoteSessions() {
@@ -34,6 +34,40 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
 
   async getRemoteLeads() {
     return readRemoteCollection<LeadRecord>('culturePulseLeads');
+  }
+
+  async syncLocalToRemote(): Promise<RemoteSyncResult> {
+    const sessions = this.getSessions();
+    const leads = this.getLeads();
+
+    let sessionsSynced = 0;
+    let sessionsFailed = 0;
+    let leadsSynced = 0;
+    let leadsFailed = 0;
+
+    for (const session of sessions) {
+      const ok = await saveRemoteRecord('culturePulseSessions', session.id, {
+        ...session,
+        answerLabels: buildAnswerLabels(session.answers),
+      });
+      if (ok) sessionsSynced += 1;
+      else sessionsFailed += 1;
+    }
+
+    for (const lead of leads) {
+      const ok = await saveRemoteRecord('culturePulseLeads', lead.id, lead);
+      if (ok) leadsSynced += 1;
+      else leadsFailed += 1;
+    }
+
+    return {
+      sessionsFound: sessions.length,
+      sessionsSynced,
+      sessionsFailed,
+      leadsFound: leads.length,
+      leadsSynced,
+      leadsFailed,
+    };
   }
 }
 
@@ -46,7 +80,7 @@ async function getFirestoreDb() {
   return getFirestore(app);
 }
 
-async function saveRemoteRecord(collectionName: string, id: string, payload: object) {
+async function saveRemoteRecord(collectionName: string, id: string, payload: object): Promise<boolean> {
   try {
     const [{ doc, serverTimestamp, setDoc }, db] = await Promise.all([import('firebase/firestore'), getFirestoreDb()]);
 
@@ -55,8 +89,10 @@ async function saveRemoteRecord(collectionName: string, id: string, payload: obj
       savedAt: serverTimestamp(),
       source: 'github-pages-demo',
     });
+    return true;
   } catch (error) {
     console.warn(`Could not save ${collectionName} record to Firestore`, error);
+    return false;
   }
 }
 
