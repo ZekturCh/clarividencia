@@ -2943,7 +2943,7 @@ h2 {
 .wave-transition.simple-question-transition.active {
   visibility: visible;
   pointer-events: auto;
-  animation: simple-question-transition-sweep var(--question-transition-duration, 950ms) cubic-bezier(0.65, 0, 0.25, 1) both;
+  animation: simple-question-transition-sweep var(--question-transition-duration, 3600ms) cubic-bezier(0.65, 0, 0.25, 1) both;
 }
 
 .simple-question-transition .transition-pulse-symbol {
@@ -2956,49 +2956,148 @@ h2 {
   object-fit: contain;
   pointer-events: none;
   opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale(0.82);
+  transform: translate3d(-50%, -50%, 0) scale(0.9);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform, opacity;
-  animation: simple-question-transition-pulse var(--question-transition-duration, 950ms) cubic-bezier(0.22, 0.8, 0.24, 1) both;
+  animation: simple-question-transition-pulse var(--question-transition-duration, 3600ms) ease-in-out both;
 }
 
 @keyframes simple-question-transition-sweep {
   0% { transform: translate3d(-101%, 0, 0); }
-  18% { transform: translate3d(0, 0, 0); }
-  76% { transform: translate3d(0, 0, 0); }
+  22.222% { transform: translate3d(0, 0, 0); }
+  77.778% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(101%, 0, 0); }
 }
 
 @keyframes simple-question-transition-pulse {
-  0%, 12% {
+  0%,
+  18% {
     opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale(0.82);
+    transform: translate3d(-50%, -50%, 0) scale(0.9);
   }
   24% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale(0.96);
+    transform: translate3d(-50%, -50%, 0) scale(0.98);
   }
-  44% {
+  38% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale(1.08);
+    transform: translate3d(-50%, -50%, 0) scale(1.06);
   }
-  60% {
+  52% {
     opacity: 1;
     transform: translate3d(-50%, -50%, 0) scale(0.98);
   }
-  74% {
+  66% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale(1.04);
-  }
-  88%, 100% {
-    opacity: 0;
     transform: translate3d(-50%, -50%, 0) scale(1.06);
   }
+  76% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+  82%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(1.04);
+  }
+}
+
+.analysis-thinking-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 32px;
+  color: white;
+  background:
+    radial-gradient(circle at 52% 42%, rgba(var(--brand-rgb-accent), 0.22), transparent 28rem),
+    linear-gradient(112deg, rgb(var(--brand-rgb-primary)) 0%, rgb(var(--brand-rgb-primary)) 43%, rgb(var(--brand-rgb-accent)) 100%);
+}
+
+.analysis-thinking-inner {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 18px;
+  width: min(780px, 90vw);
+}
+
+.analysis-thinking-symbol {
+  width: min(22vw, 220px);
+  height: auto;
+  object-fit: contain;
+  animation: analysis-symbol-breathe 1800ms ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.analysis-thinking-kicker {
+  margin: 4px 0 0;
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.analysis-thinking-message {
+  margin: 0;
+  min-height: 1.25em;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 1.04;
+  font-weight: 900;
+  color: white;
+  text-wrap: balance;
+  animation: analysis-message-in 420ms ease both;
+}
+
+.analysis-thinking-dots {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.analysis-thinking-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgb(var(--brand-rgb-accent));
+  animation: analysis-dot 1200ms ease-in-out infinite;
+}
+
+.analysis-thinking-dots span:nth-child(2) { animation-delay: 160ms; }
+.analysis-thinking-dots span:nth-child(3) { animation-delay: 320ms; }
+
+@keyframes analysis-symbol-breathe {
+  0%,
+  100% { opacity: 0.82; transform: scale(0.97); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes analysis-message-in {
+  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes analysis-dot {
+  0%,
+  70%,
+  100% { opacity: 0.3; transform: scale(0.78); }
+  35% { opacity: 1; transform: scale(1); }
 }
 
 @media (max-width: 760px) {
   .simple-question-transition .transition-pulse-symbol {
     width: min(46vw, 280px);
+  }
+
+  .analysis-thinking-symbol {
+    width: min(38vw, 180px);
+  }
+
+  .analysis-thinking-message {
+    font-size: clamp(1.8rem, 9vw, 3.2rem);
   }
 }
