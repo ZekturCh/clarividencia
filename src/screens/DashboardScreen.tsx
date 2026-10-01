@@ -11,7 +11,7 @@ interface DashboardData {
   stats: AggregateStats;
   sessions: SessionRecord[];
   leads: LeadRecord[];
-  source: 'firestore' | 'local' | 'hybrid';
+  source: 'firebase' | 'local' | 'hybrid';
 }
 
 const emptyScores = dimensions.reduce((acc, dimension) => ({ ...acc, [dimension]: 0 }), {} as Scores);
@@ -65,7 +65,7 @@ export function DashboardScreen() {
           stats: buildAggregateStats(mergedSessions),
           sessions: mergedSessions,
           leads: mergedLeads,
-          source: hasLocalOnlyData ? 'hybrid' : 'firestore',
+          source: hasLocalOnlyData ? 'hybrid' : 'firebase',
         });
       } else {
         setData(localData);
@@ -95,7 +95,7 @@ export function DashboardScreen() {
     if (!storageProvider.syncLocalToRemote || syncing) return;
 
     setSyncing(true);
-    setSyncMessage('Sincronizando datos locales con Firebase...');
+    setSyncMessage('Comparando datos locales con Firebase...');
 
     try {
       const result = await storageProvider.syncLocalToRemote();
@@ -141,10 +141,10 @@ export function DashboardScreen() {
           <span>
             {status === 'loading'
               ? 'Sincronizando'
-              : data.source === 'firestore'
-                ? 'Firestore activo'
+              : data.source === 'firebase'
+                ? 'Firebase activo'
                 : data.source === 'hybrid'
-                  ? 'Firestore + datos locales'
+                  ? 'Firebase + datos locales'
                   : 'Vista local'}
           </span>
           <strong>{data.leads.length}</strong>
@@ -157,7 +157,7 @@ export function DashboardScreen() {
         <section className="dashboard-sync-panel">
           <div>
             <strong>Respaldo en la nube</strong>
-            <span>Sube únicamente los registros locales que todavía no existen en Firebase.</span>
+            <span>Sube únicamente los registros locales que todavía no existen en Firebase Realtime Database.</span>
           </div>
           <button className="dashboard-sync-button" type="button" onClick={() => void syncLocalData()} disabled={syncing}>
             {syncing ? 'SINCRONIZANDO...' : 'SUBIR PENDIENTES A FIREBASE'}
