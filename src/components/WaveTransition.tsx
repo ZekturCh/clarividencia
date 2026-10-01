@@ -12,16 +12,11 @@ export function WaveTransition({
 }) {
   return (
     <div
-      className={active ? 'wave-transition active' : 'wave-transition'}
+      className={active ? 'wave-transition active simple-question-transition' : 'wave-transition simple-question-transition'}
       style={{ '--question-transition-duration': `${durationMs}ms` } as CSSProperties}
       aria-hidden={!active}
     >
-      <div className="wave-surface" />
-      <div className="digital-sweep" />
-      <div className="processing-scan" />
-      <img className="transition-line-symbol transition-line-symbol-one" src={symbol} alt="" />
-      <img className="transition-line-symbol transition-line-symbol-two" src={symbol} alt="" />
-      <img className="transition-brand-symbol" src={symbol} alt="" />
+      <img className="transition-pulse-symbol" src={symbol} alt="" />
     </div>
   );
 }
