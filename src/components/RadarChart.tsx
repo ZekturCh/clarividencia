@@ -27,9 +27,28 @@ export function RadarChart({ scores }: { scores: Scores }) {
       {radarDimensions.map((dimension, index) => {
         const angle = (Math.PI * 2 * index) / radarDimensions.length - Math.PI / 2;
         const cosine = Math.cos(angle);
-        const x = center + cosine * 108;
-        const y = center + Math.sin(angle) * 108;
-        const textAnchor = cosine > 0.35 ? 'end' : cosine < -0.35 ? 'start' : 'middle';
+        const sine = Math.sin(angle);
+
+        const isTop = index === 0;
+        const isRight = index === 1 || index === 2;
+        const isLeft = index === 3 || index === 4;
+        const labelRadius = isTop ? 108 : 116;
+
+        let x = center + cosine * labelRadius;
+        let y = center + sine * labelRadius;
+
+        if (index === 1) x += 8;
+        if (index === 2) {
+          x += 10;
+          y += 4;
+        }
+        if (index === 3) {
+          x -= 10;
+          y += 4;
+        }
+        if (index === 4) x -= 8;
+
+        const textAnchor = isRight ? 'start' : isLeft ? 'end' : 'middle';
 
         return (
           <text key={dimension} x={x} y={y} textAnchor={textAnchor} dominantBaseline="middle">
