@@ -40,12 +40,23 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
     const sessions = this.getSessions();
     const leads = this.getLeads();
 
+    const [remoteSessions, remoteLeads] = await Promise.all([
+      this.getRemoteSessions(),
+      this.getRemoteLeads(),
+    ]);
+
+    const remoteSessionIds = new Set(remoteSessions.map((session) => session.id));
+    const remoteLeadIds = new Set(remoteLeads.map((lead) => lead.id));
+
+    const pendingSessions = sessions.filter((session) => !remoteSessionIds.has(session.id));
+    const pendingLeads = leads.filter((lead) => !remoteLeadIds.has(lead.id));
+
     let sessionsSynced = 0;
     let sessionsFailed = 0;
     let leadsSynced = 0;
     let leadsFailed = 0;
 
-    for (const session of sessions) {
+    for (const session of pendingSessions) {
       const ok = await saveRemoteRecord('culturePulseSessions', session.id, {
         ...session,
         answerLabels: buildAnswerLabels(session.answers),
@@ -54,7 +65,7 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
       else sessionsFailed += 1;
     }
 
-    for (const lead of leads) {
+    for (const lead of pendingLeads) {
       const ok = await saveRemoteRecord('culturePulseLeads', lead.id, lead);
       if (ok) leadsSynced += 1;
       else leadsFailed += 1;
@@ -64,9 +75,11 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
       sessionsFound: sessions.length,
       sessionsSynced,
       sessionsFailed,
+      sessionsSkipped: sessions.length - pendingSessions.length,
       leadsFound: leads.length,
       leadsSynced,
       leadsFailed,
+      leadsSkipped: leads.length - pendingLeads.length,
     };
   }
 }
