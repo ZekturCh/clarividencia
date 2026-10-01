@@ -7,10 +7,14 @@ const firebaseConfig = {
   databaseURL: 'https://dbdosparax-default-rtdb.firebaseio.com',
 };
 
+const remoteItemsPath = 'led-wall/clarividencia/items';
+
+type RemoteKind = 'lead' | 'session';
+
 export class FirebaseStorageProvider extends LocalStorageProvider implements StorageProvider {
   async saveSession(session: SessionRecord) {
     super.saveSession(session);
-    return saveRemoteRecord('culturePulseSessions', session.id, {
+    return saveRemoteRecord('session', session.id, {
       ...session,
       answerLabels: buildAnswerLabels(session.answers),
     });
@@ -18,15 +22,15 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
 
   async saveLead(lead: LeadRecord) {
     super.saveLead(lead);
-    return saveRemoteRecord('culturePulseLeads', lead.id, lead);
+    return saveRemoteRecord('lead', lead.id, lead);
   }
 
   async getRemoteSessions() {
-    return readRemoteCollection<SessionRecord>('culturePulseSessions');
+    return readRemoteCollection<SessionRecord>('session');
   }
 
   async getRemoteLeads() {
-    return readRemoteCollection<LeadRecord>('culturePulseLeads');
+    return readRemoteCollection<LeadRecord>('lead');
   }
 
   async syncLocalToRemote(): Promise<RemoteSyncResult> {
@@ -50,7 +54,7 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
     let leadsFailed = 0;
 
     for (const session of pendingSessions) {
-      const ok = await saveRemoteRecord('culturePulseSessions', session.id, {
+      const ok = await saveRemoteRecord('session', session.id, {
         ...session,
         answerLabels: buildAnswerLabels(session.answers),
       });
@@ -59,7 +63,7 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
     }
 
     for (const lead of pendingLeads) {
-      const ok = await saveRemoteRecord('culturePulseLeads', lead.id, lead);
+      const ok = await saveRemoteRecord('lead', lead.id, lead);
       if (ok) leadsSynced += 1;
       else leadsFailed += 1;
     }
@@ -77,8 +81,8 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
   }
 }
 
-async function saveRemoteRecord(collectionName: string, id: string, payload: object): Promise<boolean> {
-  const url = `${firebaseConfig.databaseURL}/${collectionName}/${encodeURIComponent(id)}.json`;
+async function saveRemoteRecord(kind: RemoteKind, id: string, payload: object): Promise<boolean> {
+  const url = `${firebaseConfig.databaseURL}/${remoteItemsPath}/${encodeURIComponent(id)}.json`;
 
   try {
     const response = await fetch(url, {
@@ -86,8 +90,9 @@ async function saveRemoteRecord(collectionName: string, id: string, payload: obj
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...payload,
+        kind,
         savedAt: new Date().toISOString(),
-        source: 'github-pages-demo',
+        source: 'clarividencia-github-pages',
       }),
     });
 
@@ -98,13 +103,13 @@ async function saveRemoteRecord(collectionName: string, id: string, payload: obj
 
     return true;
   } catch (error) {
-    console.warn(`Could not save ${collectionName} record to Firebase Realtime Database`, error);
+    console.warn(`Could not save Clarividencia ${kind} to Firebase Realtime Database`, error);
     return false;
   }
 }
 
-async function readRemoteCollection<T extends { id: string; createdAt?: string }>(collectionName: string): Promise<T[]> {
-  const url = `${firebaseConfig.databaseURL}/${collectionName}.json`;
+async function readRemoteCollection<T extends { id: string; createdAt?: string }>(kind: RemoteKind): Promise<T[]> {
+  const url = `${firebaseConfig.databaseURL}/${remoteItemsPath}.json`;
 
   try {
     const response = await fetch(url, { cache: 'no-store' });
@@ -114,14 +119,18 @@ async function readRemoteCollection<T extends { id: string; createdAt?: string }
       throw new Error(`Realtime Database ${response.status}: ${detail || response.statusText}`);
     }
 
-    const payload = await response.json() as Record<string, T> | null;
+    const payload = await response.json() as Record<string, T & { kind?: string }> | null;
     if (!payload || typeof payload !== 'object') return [];
 
     return Object.entries(payload)
-      .map(([id, value]) => ({ ...value, id }))
+      .filter(([, value]) => value?.kind === kind)
+      .map(([id, value]) => {
+        const { kind: _kind, ...record } = value;
+        return { ...record, id } as T;
+      })
       .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime());
   } catch (error) {
-    console.warn(`Could not read ${collectionName} records from Firebase Realtime Database`, error);
+    console.warn(`Could not read Clarividencia ${kind} records from Firebase Realtime Database`, error);
     return [];
   }
 }
