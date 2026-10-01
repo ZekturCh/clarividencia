@@ -135,14 +135,14 @@ function App() {
     }));
 
     scheduleQuestionTimer(() => {
-      if (questionIndex === questions.length - 1) {
-        setStep('analysis');
-        return;
-      }
+      if (questionIndex === questions.length - 1) return;
       setQuestionIndex((current) => current + 1);
     }, swapAt);
 
     scheduleQuestionTimer(() => {
+      if (questionIndex === questions.length - 1) {
+        setStep('analysis');
+      }
       setTransition((current) => ({ ...current, active: false }));
       setIsQuestionAdvancing(false);
     }, diagnosticDuration);
