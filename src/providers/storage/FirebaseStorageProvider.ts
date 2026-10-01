@@ -4,14 +4,7 @@ import { LocalStorageProvider } from './LocalStorageProvider';
 import type { RemoteSyncResult, StorageProvider } from './StorageProvider';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBiqqTAaogq4Pk1MaOUvr9YgXq2brqkzqU',
-  authDomain: 'dbdosparax.firebaseapp.com',
   databaseURL: 'https://dbdosparax-default-rtdb.firebaseio.com',
-  projectId: 'dbdosparax',
-  storageBucket: 'dbdosparax.firebasestorage.app',
-  messagingSenderId: '786506932905',
-  appId: '1:786506932905:web:7035619466fd130252ffb8',
-  measurementId: 'G-CZEML31FL8',
 };
 
 export class FirebaseStorageProvider extends LocalStorageProvider implements StorageProvider {
@@ -84,52 +77,61 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
   }
 }
 
-async function getFirestoreDb() {
-  const [{ getApp, getApps, initializeApp }, { getFirestore }] = await Promise.all([
-    import('firebase/app'),
-    import('firebase/firestore'),
-  ]);
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  return getFirestore(app);
-}
-
 async function saveRemoteRecord(collectionName: string, id: string, payload: object): Promise<boolean> {
-  try {
-    const [{ doc, serverTimestamp, setDoc }, db] = await Promise.all([import('firebase/firestore'), getFirestoreDb()]);
+  const url = `${firebaseConfig.databaseURL}/${collectionName}/${encodeURIComponent(id)}.json`;
 
-    await setDoc(doc(db, collectionName, id), {
-      ...payload,
-      savedAt: serverTimestamp(),
-      source: 'github-pages-demo',
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...payload,
+        savedAt: new Date().toISOString(),
+        source: 'github-pages-demo',
+      }),
     });
+
+    if (!response.ok) {
+      const detail = await safeResponseText(response);
+      throw new Error(`Realtime Database ${response.status}: ${detail || response.statusText}`);
+    }
+
     return true;
   } catch (error) {
-    console.warn(`Could not save ${collectionName} record to Firestore`, error);
+    console.warn(`Could not save ${collectionName} record to Firebase Realtime Database`, error);
     return false;
   }
 }
 
-async function readRemoteCollection<T extends { createdAt?: string }>(collectionName: string): Promise<T[]> {
-  try {
-    const [{ collection, getDocs, orderBy, query }, db] = await Promise.all([import('firebase/firestore'), getFirestoreDb()]);
-    const snapshot = await getDocs(query(collection(db, collectionName), orderBy('createdAt', 'desc')));
+async function readRemoteCollection<T extends { id: string; createdAt?: string }>(collectionName: string): Promise<T[]> {
+  const url = `${firebaseConfig.databaseURL}/${collectionName}.json`;
 
-    return snapshot.docs.map((item) => normalizeFirestoreRecord({ id: item.id, ...item.data() }) as T);
+  try {
+    const response = await fetch(url, { cache: 'no-store' });
+
+    if (!response.ok) {
+      const detail = await safeResponseText(response);
+      throw new Error(`Realtime Database ${response.status}: ${detail || response.statusText}`);
+    }
+
+    const payload = await response.json() as Record<string, T> | null;
+    if (!payload || typeof payload !== 'object') return [];
+
+    return Object.entries(payload)
+      .map(([id, value]) => ({ ...value, id }))
+      .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime());
   } catch (error) {
-    console.warn(`Could not read ${collectionName} records from Firestore`, error);
+    console.warn(`Could not read ${collectionName} records from Firebase Realtime Database`, error);
     return [];
   }
 }
 
-function normalizeFirestoreRecord(record: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(record).map(([key, value]) => {
-      if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
-        return [key, value.toDate().toISOString()];
-      }
-      return [key, value];
-    }),
-  );
+async function safeResponseText(response: Response) {
+  try {
+    return (await response.text()).slice(0, 240);
+  } catch {
+    return '';
+  }
 }
 
 function buildAnswerLabels(answers: Answers) {
