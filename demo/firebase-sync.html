@@ -29,7 +29,7 @@
   <section class="card">
     <div class="eyebrow">ClarividencIA Data</div>
     <h1>Sincronización Firebase</h1>
-    <p class="hint">Esta página no borra nada local. Compara por ID y sube únicamente los registros que falten en Firebase Realtime Database.</p>
+    <p class="hint">Esta página no borra nada local. Usa el mismo árbol permitido que MEMORYGAME: led-wall/clarividencia/items. Compara por ID y sube únicamente los registros que falten.</p>
   </section>
 
   <section class="card">
@@ -54,6 +54,7 @@
 
 <script>
 const DB='https://dbdosparax-default-rtdb.firebaseio.com';
+const REMOTE_ITEMS='led-wall/clarividencia/items';
 const LS_LEADS='culture-pulse-leads';
 const LS_SESSIONS='culture-pulse-sessions';
 
@@ -67,20 +68,25 @@ const localSessions=()=>parseLocal(LS_SESSIONS);
 async function responseDetail(res){
   try{return (await res.text()).slice(0,500)}catch{return ''}
 }
-async function getCollection(name){
-  const res=await fetch(DB+'/'+name+'.json?ts='+Date.now(),{cache:'no-store'});
-  if(!res.ok) throw new Error('GET '+name+' → HTTP '+res.status+' · '+((await responseDetail(res))||res.statusText));
+async function getRemoteItems(){
+  const res=await fetch(DB+'/'+REMOTE_ITEMS+'.json?ts='+Date.now(),{cache:'no-store'});
+  if(!res.ok) throw new Error('GET '+REMOTE_ITEMS+' → HTTP '+res.status+' · '+((await responseDetail(res))||res.statusText));
   const data=await res.json();
   if(!data||typeof data!=='object') return [];
   return Object.entries(data).map(([id,value])=>({...value,id}));
 }
-async function putRecord(name,record){
-  const res=await fetch(DB+'/'+name+'/'+encodeURIComponent(record.id)+'.json',{
+async function getCollection(kind){
+  const items=await getRemoteItems();
+  return items.filter(item=>item?.kind===kind);
+}
+async function putRecord(kind,record){
+  const path=REMOTE_ITEMS+'/'+encodeURIComponent(record.id);
+  const res=await fetch(DB+'/'+path+'.json',{
     method:'PUT',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({...record,savedAt:new Date().toISOString(),source:'clarividencia-sync-page'})
+    body:JSON.stringify({...record,kind,savedAt:new Date().toISOString(),source:'clarividencia-sync-page'})
   });
-  if(!res.ok) throw new Error('PUT '+name+'/'+record.id+' → HTTP '+res.status+' · '+((await responseDetail(res))||res.statusText));
+  if(!res.ok) throw new Error('PUT '+path+' → HTTP '+res.status+' · '+((await responseDetail(res))||res.statusText));
 }
 
 function renderLocal(){
@@ -100,7 +106,7 @@ function setStatus(msg,type=''){
 async function refreshCloud(){
   renderLocal();
   try{
-    const [leads,sessions]=await Promise.all([getCollection('culturePulseLeads'),getCollection('culturePulseSessions')]);
+    const [leads,sessions]=await Promise.all([getCollection('lead'),getCollection('session')]);
     $('cloudLeads').textContent=leads.length;
     $('cloudSessions').textContent=sessions.length;
     renderCloudLeads(leads);
@@ -123,8 +129,8 @@ $('syncBtn').addEventListener('click',async()=>{
     const pendingSessions=localSessions().filter(x=>x?.id&&!rs.has(x.id));
     let okL=0,okS=0;
     setStatus('Pendientes detectados: '+pendingLeads.length+' leads y '+pendingSessions.length+' diagnósticos. Subiendo…');
-    for(const x of pendingSessions){await putRecord('culturePulseSessions',x);okS++;setStatus('Subiendo diagnósticos '+okS+'/'+pendingSessions.length+' · Leads '+okL+'/'+pendingLeads.length);}
-    for(const x of pendingLeads){await putRecord('culturePulseLeads',x);okL++;setStatus('Diagnósticos '+okS+'/'+pendingSessions.length+' · Subiendo leads '+okL+'/'+pendingLeads.length);}
+    for(const x of pendingSessions){await putRecord('session',x);okS++;setStatus('Subiendo diagnósticos '+okS+'/'+pendingSessions.length+' · Leads '+okL+'/'+pendingLeads.length);}
+    for(const x of pendingLeads){await putRecord('lead',x);okL++;setStatus('Diagnósticos '+okS+'/'+pendingSessions.length+' · Subiendo leads '+okL+'/'+pendingLeads.length);}
     const final=await refreshCloud();
     setStatus('LISTO. Se subieron '+okL+' leads y '+okS+' diagnósticos nuevos. Firebase ahora contiene '+final.leads.length+' leads y '+final.sessions.length+' diagnósticos. No se borró nada local.','ok');
   }catch(err){
