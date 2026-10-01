@@ -11,7 +11,7 @@ interface DashboardData {
   stats: AggregateStats;
   sessions: SessionRecord[];
   leads: LeadRecord[];
-  source: 'firestore' | 'local';
+  source: 'firestore' | 'local' | 'hybrid';
 }
 
 const emptyScores = dimensions.reduce((acc, dimension) => ({ ...acc, [dimension]: 0 }), {} as Scores);
@@ -25,6 +25,8 @@ export function DashboardScreen() {
     source: 'local',
   }));
   const [status, setStatus] = useState<'loading' | 'ready'>('loading');
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -54,11 +56,16 @@ export function DashboardScreen() {
       if (!active) return;
 
       if (remoteSessions.length || remoteLeads.length) {
+        const mergedSessions = mergeById(remoteSessions, localData.sessions);
+        const mergedLeads = mergeById(remoteLeads, localData.leads);
+        const hasLocalOnlyData =
+          mergedSessions.length > remoteSessions.length || mergedLeads.length > remoteLeads.length;
+
         setData({
-          stats: buildAggregateStats(remoteSessions),
-          sessions: remoteSessions,
-          leads: remoteLeads,
-          source: 'firestore',
+          stats: buildAggregateStats(mergedSessions),
+          sessions: mergedSessions,
+          leads: mergedLeads,
+          source: hasLocalOnlyData ? 'hybrid' : 'firestore',
         });
       } else {
         setData(localData);
@@ -84,6 +91,31 @@ export function DashboardScreen() {
     };
   }, [storageProvider]);
 
+  const syncLocalData = async () => {
+    if (!storageProvider.syncLocalToRemote || syncing) return;
+
+    setSyncing(true);
+    setSyncMessage('Sincronizando datos locales con Firebase...');
+
+    try {
+      const result = await storageProvider.syncLocalToRemote();
+      const failures = result.sessionsFailed + result.leadsFailed;
+
+      setSyncMessage(
+        failures
+          ? `Firebase: ${result.leadsSynced}/${result.leadsFound} leads y ${result.sessionsSynced}/${result.sessionsFound} diagnósticos sincronizados. ${failures} fallaron.`
+          : `Firebase actualizado: ${result.leadsSynced} leads y ${result.sessionsSynced} diagnósticos sincronizados.`,
+      );
+
+      window.dispatchEvent(new Event(STORAGE_EVENT_NAME));
+    } catch (error) {
+      console.warn('Could not synchronize local Clarividencia data', error);
+      setSyncMessage('No se pudo completar la sincronización. Los datos locales siguen intactos.');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const leadsBySession = useMemo(() => new Map(data.leads.map((lead) => [lead.sessionId, lead])), [data.leads]);
   const conversionRate = data.sessions.length ? Math.round((data.leads.length / data.sessions.length) * 100) : 0;
   const latestLeads = data.leads.slice(0, 14);
@@ -98,9 +130,23 @@ export function DashboardScreen() {
           <h2>{EVENT_NAME} {EVENT_YEAR}</h2>
         </div>
         <div className="dashboard-source">
-          <span>{status === 'loading' ? 'Sincronizando' : data.source === 'firestore' ? 'Firestore activo' : 'Vista local'}</span>
+          <span>
+            {status === 'loading'
+              ? 'Sincronizando'
+              : data.source === 'firestore'
+                ? 'Firestore activo'
+                : data.source === 'hybrid'
+                  ? 'Firestore + datos locales'
+                  : 'Vista local'}
+          </span>
           <strong>{data.leads.length}</strong>
           <small>registros capturados</small>
+          {storageProvider.syncLocalToRemote && (
+            <button className="dashboard-sync-button" type="button" onClick={() => void syncLocalData()} disabled={syncing}>
+              {syncing ? 'SINCRONIZANDO...' : 'SINCRONIZAR LOCAL → FIREBASE'}
+            </button>
+          )}
+          {syncMessage && <small className="dashboard-sync-message">{syncMessage}</small>}
         </div>
       </div>
 
@@ -231,6 +277,17 @@ function LeadQr({ lead }: { lead: LeadRecord }) {
       <small>Expediente</small>
     </a>
   );
+}
+
+function mergeById<T extends { id: string }>(remote: T[], local: T[]) {
+  const merged = new Map<string, T>();
+  local.forEach((item) => merged.set(item.id, item));
+  remote.forEach((item) => merged.set(item.id, item));
+  return [...merged.values()].sort((a, b) => {
+    const aDate = 'createdAt' in a ? new Date((a as { createdAt?: string }).createdAt ?? 0).getTime() : 0;
+    const bDate = 'createdAt' in b ? new Date((b as { createdAt?: string }).createdAt ?? 0).getTime() : 0;
+    return bDate - aDate;
+  });
 }
 
 function MetricCard({ label, value, detail }: { label: string; value: number | string; detail: string }) {
