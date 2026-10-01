@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import QRCode from 'qrcode';
 import { EVENT_NAME, EVENT_YEAR, STORAGE_EVENT_NAME } from '../config';
 import { ProgressBar } from '../components/ProgressBar';
 import { questions } from '../data/questions';
@@ -15,6 +14,14 @@ interface DashboardData {
 }
 
 const emptyScores = dimensions.reduce((acc, dimension) => ({ ...acc, [dimension]: 0 }), {} as Scores);
+
+const answerFields: Array<{ id: QuestionId; label: string }> = [
+  { id: 'mainChallenge', label: 'Reto principal' },
+  { id: 'teamState', label: 'Estado del equipo' },
+  { id: 'desiredOutcome', label: 'Objetivo' },
+  { id: 'orgSize', label: 'Tamaño' },
+  { id: 'experienceFocus', label: 'Experiencia a mejorar' },
+];
 
 export function DashboardScreen() {
   const { storageProvider } = useAppServices();
@@ -124,10 +131,13 @@ export function DashboardScreen() {
     }
   };
 
+  const sessionsById = useMemo(() => new Map(data.sessions.map((session) => [session.id, session])), [data.sessions]);
   const leadsBySession = useMemo(() => new Map(data.leads.map((lead) => [lead.sessionId, lead])), [data.leads]);
+  const unregisteredSessions = useMemo(
+    () => data.sessions.filter((session) => !leadsBySession.has(session.id)),
+    [data.sessions, leadsBySession],
+  );
   const conversionRate = data.sessions.length ? Math.round((data.leads.length / data.sessions.length) * 100) : 0;
-  const latestLeads = data.leads.slice(0, 14);
-  const latestSessions = data.sessions.slice(0, 10);
 
   return (
     <main className="dashboard-page dashboard-admin-page">
@@ -148,8 +158,7 @@ export function DashboardScreen() {
                   : 'Vista local'}
           </span>
           <strong>{data.leads.length}</strong>
-          <small>registros capturados</small>
-
+          <small>leads capturados</small>
         </div>
       </div>
 
@@ -166,14 +175,99 @@ export function DashboardScreen() {
         </section>
       )}
 
-      <section className="metric-card-grid">
+      <section className="dashboard-leads-primary">
+        <div className="records-heading">
+          <div>
+            <p className="dashboard-section-kicker">Base comercial</p>
+            <h3>Leads registrados</h3>
+          </div>
+          <span>{data.leads.length} registros</span>
+        </div>
+
+        <div className="dashboard-lead-list">
+          {data.leads.length ? (
+            data.leads.map((lead) => {
+              const session = sessionsById.get(lead.sessionId);
+              return (
+                <article key={lead.id} className="dashboard-lead-card">
+                  <header className="dashboard-lead-head">
+                    <div className="dashboard-lead-identity">
+                      <strong>{lead.fullName || 'Sin nombre'}</strong>
+                      <span className="dashboard-role">{lead.role || 'Sin cargo'}</span>
+                      <span className="dashboard-company">{lead.company || 'Sin empresa'}</span>
+                    </div>
+                    <time>{formatDate(lead.createdAt)}</time>
+                  </header>
+
+                  <div className="dashboard-contact-row">
+                    <a href={`mailto:${lead.email}`}>{lead.email || 'Sin correo'}</a>
+                    <a href={buildWhatsAppUrl(lead)} target="_blank" rel="noreferrer">
+                      {lead.whatsapp || 'Sin teléfono'}
+                    </a>
+                  </div>
+
+                  <div className="dashboard-answer-grid">
+                    {answerFields.map((field) => (
+                      <div key={field.id} className="dashboard-answer-item">
+                        <span>{field.label}</span>
+                        <strong>{session ? formatAnswer(session, field.id) : 'Sin diagnóstico vinculado'}</strong>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="dashboard-interest-row">
+                    <span>Marcó al enviar sus datos</span>
+                    <strong>{lead.interests?.length ? lead.interests.join(' · ') : 'Sin intereses marcados'}</strong>
+                  </div>
+                </article>
+              );
+            })
+          ) : (
+            <p className="empty-state">Todavía no hay leads registrados.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="dashboard-unregistered">
+        <div className="records-heading">
+          <div>
+            <p className="dashboard-section-kicker">Sin datos de contacto</p>
+            <h3>Usaron la plataforma pero no dejaron datos</h3>
+          </div>
+          <span>{unregisteredSessions.length} participantes</span>
+        </div>
+
+        <div className="dashboard-unregistered-list">
+          {unregisteredSessions.length ? (
+            unregisteredSessions.map((session) => (
+              <article key={session.id} className="dashboard-unregistered-card">
+                <div className="dashboard-unregistered-main">
+                  <strong>Participante sin registro</strong>
+                  <span>{formatDate(session.createdAt)} · Score {session.totalScore}</span>
+                </div>
+                <div className="dashboard-unregistered-answers">
+                  {answerFields.map((field) => (
+                    <span key={field.id}>
+                      <b>{field.label}:</b> {formatAnswer(session, field.id)}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            ))
+          ) : (
+            <p className="empty-state">Todos los diagnósticos actuales tienen datos de contacto asociados.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="metric-card-grid dashboard-secondary-metrics">
         <MetricCard label="Participantes" value={data.stats.totalParticipants} detail="Diagnósticos completados" />
         <MetricCard label="Registros" value={data.leads.length} detail="Personas que dejaron datos" />
         <MetricCard label="Conversión" value={`${conversionRate}%`} detail="Registro sobre diagnóstico" />
         <MetricCard label="Pulso promedio" value={data.stats.averageScore} detail="Score cultural general" />
       </section>
 
-      <section className="dashboard-grid">
+      <section className="dashboard-grid dashboard-secondary-metrics">
         <div>
           <h3>Principal reto</h3>
           {(data.stats.challengeDistribution.length ? data.stats.challengeDistribution : [{ label: 'Sin datos todavía', percentage: 0, count: 0 }]).map((item) => (
@@ -193,105 +287,7 @@ export function DashboardScreen() {
           ))}
         </div>
       </section>
-
-      <section className="dashboard-records">
-        <div className="records-panel">
-          <div className="records-heading">
-            <h3>Registrados</h3>
-            <span>{latestLeads.length} visibles</span>
-          </div>
-          <div className="records-table leads-table">
-            {latestLeads.length ? (
-              latestLeads.map((lead) => (
-                <article key={lead.id} className="record-row lead-record-row">
-                  <LeadQr lead={lead} />
-                  <div className="lead-data-block">
-                    <span>Nombre</span>
-                    <strong>{lead.fullName || 'Sin nombre'}</strong>
-                  </div>
-                  <div className="lead-data-block">
-                    <span>Empresa / cargo</span>
-                    <strong>{lead.company || 'Sin empresa'}</strong>
-                    <small>{lead.role || 'Sin cargo'}</small>
-                  </div>
-                  <div className="lead-data-block">
-                    <span>Contacto</span>
-                    <a href={`mailto:${lead.email}`}>{lead.email || 'Sin correo'}</a>
-                    <a href={buildWhatsAppUrl(lead)} target="_blank" rel="noreferrer">{lead.whatsapp || 'Sin WhatsApp'}</a>
-                  </div>
-                  <div className="lead-data-block">
-                    <span>Intereses</span>
-                    <small>{lead.interests?.length ? lead.interests.join(', ') : 'Sin intereses marcados'}</small>
-                    <time>{formatDate(lead.createdAt)}</time>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <p className="empty-state">Todavía no hay registros guardados.</p>
-            )}
-          </div>
-        </div>
-
-        <div className="records-panel">
-          <div className="records-heading">
-            <h3>Últimos diagnósticos</h3>
-            <span>{latestSessions.length} visibles</span>
-          </div>
-          <div className="records-table">
-            {latestSessions.length ? (
-              latestSessions.map((session) => {
-                const lead = leadsBySession.get(session.id);
-                return (
-                  <article key={session.id} className="record-row compact">
-                    <div>
-                      <strong>{lead?.fullName ?? 'Participante sin registro'}</strong>
-                      <span>{formatAnswer(session, 'mainChallenge')} · {formatAnswer(session, 'desiredOutcome')}</span>
-                    </div>
-                    <div>
-                      <strong>{session.totalScore}</strong>
-                      <span>{formatDate(session.createdAt)}</span>
-                    </div>
-                  </article>
-                );
-              })
-            ) : (
-              <p className="empty-state">Todavía no hay diagnósticos guardados.</p>
-            )}
-          </div>
-        </div>
-      </section>
     </main>
-  );
-}
-
-function LeadQr({ lead }: { lead: LeadRecord }) {
-  const [qrDataUrl, setQrDataUrl] = useState('');
-  const qrPayload = buildWhatsAppUrl(lead);
-
-  useEffect(() => {
-    let active = true;
-    void QRCode.toDataURL(qrPayload, {
-      color: {
-        dark: '#000f46',
-        light: '#ffffff',
-      },
-      errorCorrectionLevel: 'M',
-      margin: 1,
-      width: 116,
-    }).then((dataUrl) => {
-      if (active) setQrDataUrl(dataUrl);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [qrPayload]);
-
-  return (
-    <a className="lead-qr" href={qrPayload} target="_blank" rel="noreferrer" aria-label={`Abrir WhatsApp de ${lead.fullName || 'registro'}`}>
-      {qrDataUrl ? <img src={qrDataUrl} alt="" /> : <span />}
-      <small>Expediente</small>
-    </a>
   );
 }
 
@@ -369,7 +365,7 @@ function formatAnswer(session: SessionRecord, questionId: QuestionId) {
 function formatDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Sin fecha';
-  return new Intl.DateTimeFormat('es-CO', {
+  return new Intl.DateTimeFormat('es-PE', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
