@@ -37,10 +37,9 @@ export class FirebaseStorageProvider extends LocalStorageProvider implements Sto
     const sessions = this.getSessions();
     const leads = this.getLeads();
 
-    const [remoteSessions, remoteLeads] = await Promise.all([
-      this.getRemoteSessions(),
-      this.getRemoteLeads(),
-    ]);
+    const remoteItems = await readRemoteItems();
+    const remoteSessions = filterRemoteItems<SessionRecord>(remoteItems, 'session');
+    const remoteLeads = filterRemoteItems<LeadRecord>(remoteItems, 'lead');
 
     const remoteSessionIds = new Set(remoteSessions.map((session) => session.id));
     const remoteLeadIds = new Set(remoteLeads.map((lead) => lead.id));
@@ -108,7 +107,7 @@ async function saveRemoteRecord(kind: RemoteKind, id: string, payload: object): 
   }
 }
 
-async function readRemoteCollection<T extends { id: string; createdAt?: string }>(kind: RemoteKind): Promise<T[]> {
+async function readRemoteItems(): Promise<Array<Record<string, unknown> & { id: string; kind?: string; createdAt?: string }>> {
   const url = `${firebaseConfig.databaseURL}/${remoteItemsPath}.json`;
 
   try {
@@ -119,20 +118,31 @@ async function readRemoteCollection<T extends { id: string; createdAt?: string }
       throw new Error(`Realtime Database ${response.status}: ${detail || response.statusText}`);
     }
 
-    const payload = await response.json() as Record<string, T & { kind?: string }> | null;
+    const payload = await response.json() as Record<string, Record<string, unknown> & { kind?: string; createdAt?: string }> | null;
     if (!payload || typeof payload !== 'object') return [];
 
-    return Object.entries(payload)
-      .filter(([, value]) => value?.kind === kind)
-      .map(([id, value]) => {
-        const { kind: _kind, ...record } = value;
-        return { ...record, id } as T;
-      })
-      .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime());
+    return Object.entries(payload).map(([id, value]) => ({ ...value, id }));
   } catch (error) {
-    console.warn(`Could not read Clarividencia ${kind} records from Firebase Realtime Database`, error);
+    console.warn('Could not read Clarividencia records from Firebase Realtime Database', error);
     return [];
   }
+}
+
+function filterRemoteItems<T extends { id: string; createdAt?: string }>(
+  items: Array<Record<string, unknown> & { id: string; kind?: string; createdAt?: string }>,
+  kind: RemoteKind,
+): T[] {
+  return items
+    .filter((item) => item.kind === kind)
+    .map((item) => {
+      const { kind: _kind, ...record } = item;
+      return record as T;
+    })
+    .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime());
+}
+
+async function readRemoteCollection<T extends { id: string; createdAt?: string }>(kind: RemoteKind): Promise<T[]> {
+  return filterRemoteItems<T>(await readRemoteItems(), kind);
 }
 
 async function safeResponseText(response: Response) {
