@@ -149,14 +149,22 @@ export function DashboardScreen() {
           </span>
           <strong>{data.leads.length}</strong>
           <small>registros capturados</small>
-          {storageProvider.syncLocalToRemote && (
-            <button className="dashboard-sync-button" type="button" onClick={() => void syncLocalData()} disabled={syncing}>
-              {syncing ? 'SINCRONIZANDO...' : 'SUBIR PENDIENTES A FIREBASE'}
-            </button>
-          )}
-          {syncMessage && <small className="dashboard-sync-message">{syncMessage}</small>}
+
         </div>
       </div>
+
+      {storageProvider.syncLocalToRemote && (
+        <section className="dashboard-sync-panel">
+          <div>
+            <strong>Respaldo en la nube</strong>
+            <span>Sube únicamente los registros locales que todavía no existen en Firebase.</span>
+          </div>
+          <button className="dashboard-sync-button" type="button" onClick={() => void syncLocalData()} disabled={syncing}>
+            {syncing ? 'SINCRONIZANDO...' : 'SUBIR PENDIENTES A FIREBASE'}
+          </button>
+          {syncMessage && <small className="dashboard-sync-message">{syncMessage}</small>}
+        </section>
+      )}
 
       <section className="metric-card-grid">
         <MetricCard label="Participantes" value={data.stats.totalParticipants} detail="Diagnósticos completados" />
