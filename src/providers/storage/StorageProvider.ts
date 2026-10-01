@@ -4,9 +4,11 @@ export interface RemoteSyncResult {
   sessionsFound: number;
   sessionsSynced: number;
   sessionsFailed: number;
+  sessionsSkipped: number;
   leadsFound: number;
   leadsSynced: number;
   leadsFailed: number;
+  leadsSkipped: number;
 }
 
 export interface StorageProvider {
