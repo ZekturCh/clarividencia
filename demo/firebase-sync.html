@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <title>ClarividencIA · Sincronización Firebase</title>
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#07184f;background:#eef9f6}
+    *{box-sizing:border-box} body{margin:0;padding:24px;background:linear-gradient(145deg,#f8ffff,#eaf8f4);min-height:100vh}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #dce6e9;border-radius:18px;padding:22px;box-shadow:0 12px 34px rgba(7,24,79,.08)}
+    h1{font-size:clamp(2rem,6vw,3.4rem);line-height:.95;margin:8px 0 4px} h2{margin:0 0 14px;font-size:1.2rem}
+    .eyebrow{color:#35c89b;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .metric{padding:16px;border:1px solid #e0e8eb;border-radius:14px;background:#fbfefe}.metric span{display:block;font-size:.74rem;font-weight:900;color:#35c89b;text-transform:uppercase}.metric strong{display:block;font-size:2rem;margin-top:8px}
+    button{width:100%;min-height:58px;border:0;border-radius:14px;background:#07184f;color:#fff;font-weight:900;font-size:1rem;cursor:pointer;padding:10px 18px}button:disabled{opacity:.55;cursor:wait}
+    .status{white-space:pre-wrap;word-break:break-word;padding:14px;border-radius:12px;background:#f3f7f8;color:#405064;font-weight:700}
+    .ok{background:#edfdf7;color:#0b7658}.err{background:#fff2f2;color:#9a2424}
+    .lead{padding:12px 0;border-top:1px solid #e5ecee;display:grid;gap:3px}.lead:first-child{border-top:0}.lead strong{font-size:1rem}.lead small{color:#617084}
+    .hint{color:#617084;line-height:1.45;margin:0}
+    a{color:#07184f;font-weight:800}
+    @media(max-width:760px){body{padding:14px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:17px}}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="eyebrow">ClarividencIA Data</div>
+    <h1>Sincronización Firebase</h1>
+    <p class="hint">Esta página no borra nada local. Compara por ID y sube únicamente los registros que falten en Firebase Realtime Database.</p>
+  </section>
+
+  <section class="card">
+    <div class="grid">
+      <div class="metric"><span>Leads locales</span><strong id="localLeads">–</strong></div>
+      <div class="metric"><span>Diagnósticos locales</span><strong id="localSessions">–</strong></div>
+      <div class="metric"><span>Leads nube</span><strong id="cloudLeads">–</strong></div>
+      <div class="metric"><span>Diagnósticos nube</span><strong id="cloudSessions">–</strong></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <button id="syncBtn">SUBIR PENDIENTES A FIREBASE</button>
+    <div id="status" class="status" style="margin-top:14px">Consultando Firebase…</div>
+  </section>
+
+  <section class="card">
+    <h2>Registros que existen en la nube</h2>
+    <div id="cloudList"><p class="hint">Cargando…</p></div>
+  </section>
+</main>
+
+<script>
+const DB='https://dbdosparax-default-rtdb.firebaseio.com';
+const LS_LEADS='culture-pulse-leads';
+const LS_SESSIONS='culture-pulse-sessions';
+
+const $=id=>document.getElementById(id);
+const parseLocal=key=>{
+  try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v:[]}catch{return[]}
+};
+const localLeads=()=>parseLocal(LS_LEADS);
+const localSessions=()=>parseLocal(LS_SESSIONS);
+
+async function responseDetail(res){
+  try{return (await res.text()).slice(0,500)}catch{return ''}
+}
+async function getCollection(name){
+  const res=await fetch(DB+'/'+name+'.json?ts='+Date.now(),{cache:'no-store'});
+  if(!res.ok) throw new Error('GET '+name+' → HTTP '+res.status+' · '+((await responseDetail(res))||res.statusText));
+  const data=await res.json();
+  if(!data||typeof data!=='object') return [];
+  return Object.entries(data).map(([id,value])=>({...value,id}));
+}
+async function putRecord(name,record){
+  const res=await fetch(DB+'/'+name+'/'+encodeURIComponent(record.id)+'.json',{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({...record,savedAt:new Date().toISOString(),source:'clarividencia-sync-page'})
+  });
+  if(!res.ok) throw new Error('PUT '+name+'/'+record.id+' → HTTP '+res.status+' · '+((await responseDetail(res))||res.statusText));
+}
+
+function renderLocal(){
+  $('localLeads').textContent=localLeads().length;
+  $('localSessions').textContent=localSessions().length;
+}
+function renderCloudLeads(leads){
+  $('cloudList').innerHTML=leads.length?leads
+    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0))
+    .map(x=>'<div class="lead"><strong>'+esc(x.fullName||'Sin nombre')+'</strong><small>'+esc((x.company||'Sin empresa')+' · '+(x.role||'Sin cargo'))+'</small><small>'+esc((x.email||'Sin correo')+' · '+(x.whatsapp||'Sin WhatsApp'))+'</small></div>')
+    .join(''):'<p class="hint">Todavía no hay leads en Firebase.</p>';
+}
+function esc(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function setStatus(msg,type=''){
+  const el=$('status');el.textContent=msg;el.className='status'+(type?' '+type:'');
+}
+async function refreshCloud(){
+  renderLocal();
+  try{
+    const [leads,sessions]=await Promise.all([getCollection('culturePulseLeads'),getCollection('culturePulseSessions')]);
+    $('cloudLeads').textContent=leads.length;
+    $('cloudSessions').textContent=sessions.length;
+    renderCloudLeads(leads);
+    setStatus('Firebase responde correctamente. Puedes subir los pendientes de este dispositivo.','ok');
+    return {leads,sessions};
+  }catch(err){
+    $('cloudLeads').textContent='!';
+    $('cloudSessions').textContent='!';
+    $('cloudList').innerHTML='<p class="hint">No se pudo leer la nube.</p>';
+    setStatus('ERROR DE FIREBASE:\n'+(err?.message||String(err))+'\n\nLos datos locales siguen intactos.','err');
+    throw err;
+  }
+}
+$('syncBtn').addEventListener('click',async()=>{
+  const btn=$('syncBtn');btn.disabled=true;btn.textContent='SINCRONIZANDO…';
+  try{
+    const remote=await refreshCloud();
+    const rl=new Set(remote.leads.map(x=>x.id)), rs=new Set(remote.sessions.map(x=>x.id));
+    const pendingLeads=localLeads().filter(x=>x?.id&&!rl.has(x.id));
+    const pendingSessions=localSessions().filter(x=>x?.id&&!rs.has(x.id));
+    let okL=0,okS=0;
+    setStatus('Pendientes detectados: '+pendingLeads.length+' leads y '+pendingSessions.length+' diagnósticos. Subiendo…');
+    for(const x of pendingSessions){await putRecord('culturePulseSessions',x);okS++;setStatus('Subiendo diagnósticos '+okS+'/'+pendingSessions.length+' · Leads '+okL+'/'+pendingLeads.length);}
+    for(const x of pendingLeads){await putRecord('culturePulseLeads',x);okL++;setStatus('Diagnósticos '+okS+'/'+pendingSessions.length+' · Subiendo leads '+okL+'/'+pendingLeads.length);}
+    const final=await refreshCloud();
+    setStatus('LISTO. Se subieron '+okL+' leads y '+okS+' diagnósticos nuevos. Firebase ahora contiene '+final.leads.length+' leads y '+final.sessions.length+' diagnósticos. No se borró nada local.','ok');
+  }catch(err){
+    setStatus('NO SE PUDO SINCRONIZAR.\n'+(err?.message||String(err))+'\n\nNo se borró ningún dato local.','err');
+  }finally{
+    btn.disabled=false;btn.textContent='SUBIR PENDIENTES A FIREBASE';
+  }
+});
+renderLocal();
+refreshCloud().catch(()=>{});
+</script>
+</body>
+</html>
