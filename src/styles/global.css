@@ -3101,3 +3101,34 @@ h2 {
     font-size: clamp(1.8rem, 9vw, 3.2rem);
   }
 }
+
+
+/* Result radar enlargement v4 */
+.result-screen .radar {
+  width: min(100%, 704px);
+}
+
+.result-screen .score-panel {
+  min-height: 560px;
+}
+
+@media (orientation: portrait) and (min-width: 761px) {
+  .result-screen .score-panel {
+    min-height: 672px;
+  }
+
+  .result-screen .radar {
+    width: 752px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .result-screen .score-panel {
+    min-height: 430px;
+  }
+
+  .result-screen .radar {
+    width: min(100%, 512px);
+  }
+}
