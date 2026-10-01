@@ -148,14 +148,16 @@ function App() {
     }, diagnosticDuration);
   };
 
-  const submitLead = (values: LeadFormValues) => {
+  const submitLead = async (values: LeadFormValues) => {
     if (!activeSession) return;
-    storageProvider.saveLead({
+
+    await storageProvider.saveLead({
       id: createId('lead'),
       sessionId: activeSession.id,
       createdAt: new Date().toISOString(),
       ...values,
     });
+
     setStep('final');
   };
 
