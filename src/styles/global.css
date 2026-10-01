@@ -3316,3 +3316,13 @@ h2 {
     line-height: 1.14;
   }
 }
+
+
+/* Radar label spacing v6 */
+.result-screen .radar {
+  overflow: visible;
+}
+
+.result-screen .score-panel {
+  overflow: visible;
+}
