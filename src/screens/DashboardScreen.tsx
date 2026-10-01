@@ -101,11 +101,19 @@ export function DashboardScreen() {
       const result = await storageProvider.syncLocalToRemote();
       const failures = result.sessionsFailed + result.leadsFailed;
 
-      setSyncMessage(
-        failures
-          ? `Firebase: ${result.leadsSynced}/${result.leadsFound} leads y ${result.sessionsSynced}/${result.sessionsFound} diagnósticos sincronizados. ${failures} fallaron.`
-          : `Firebase actualizado: ${result.leadsSynced} leads y ${result.sessionsSynced} diagnósticos sincronizados.`,
-      );
+      if (failures) {
+        setSyncMessage(
+          `Firebase: ${result.leadsSynced} leads nuevos, ${result.leadsSkipped} ya estaban; ${result.sessionsSynced} diagnósticos nuevos, ${result.sessionsSkipped} ya estaban. ${failures} fallaron.`,
+        );
+      } else if (result.leadsSynced === 0 && result.sessionsSynced === 0) {
+        setSyncMessage(
+          `Sin pendientes: ${result.leadsSkipped} leads y ${result.sessionsSkipped} diagnósticos ya estaban en Firebase.`,
+        );
+      } else {
+        setSyncMessage(
+          `Firebase actualizado: ${result.leadsSynced} leads nuevos y ${result.sessionsSynced} diagnósticos nuevos. ${result.leadsSkipped + result.sessionsSkipped} registros ya estaban en la nube.`,
+        );
+      }
 
       window.dispatchEvent(new Event(STORAGE_EVENT_NAME));
     } catch (error) {
@@ -143,7 +151,7 @@ export function DashboardScreen() {
           <small>registros capturados</small>
           {storageProvider.syncLocalToRemote && (
             <button className="dashboard-sync-button" type="button" onClick={() => void syncLocalData()} disabled={syncing}>
-              {syncing ? 'SINCRONIZANDO...' : 'SINCRONIZAR LOCAL → FIREBASE'}
+              {syncing ? 'SINCRONIZANDO...' : 'SUBIR PENDIENTES A FIREBASE'}
             </button>
           )}
           {syncMessage && <small className="dashboard-sync-message">{syncMessage}</small>}
