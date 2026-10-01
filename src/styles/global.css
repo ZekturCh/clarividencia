@@ -2918,3 +2918,115 @@ h2 {
     padding: 2px 0;
   }
 }
+
+/* Lightweight question transition override: gradient + centered pulsing brand symbol. */
+.wave-transition.simple-question-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    112deg,
+    rgb(var(--brand-rgb-primary)) 0%,
+    rgb(var(--brand-rgb-primary)) 42%,
+    rgb(var(--brand-rgb-accent)) 100%
+  );
+  contain: strict;
+  will-change: opacity;
+}
+
+.wave-transition.simple-question-transition.active {
+  visibility: visible;
+  pointer-events: auto;
+  animation: simple-question-transition-shell var(--question-transition-duration, 950ms) ease-in-out both;
+}
+
+.simple-question-transition .transition-pulse-symbol {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: min(34vw, 360px);
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) scale(0.82);
+  transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  animation: simple-question-transition-pulse var(--question-transition-duration, 950ms) cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+
+@keyframes simple-question-transition-shell {
+  0% {
+    opacity: 0;
+  }
+  14%,
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes simple-question-transition-pulse {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.82);
+  }
+  20% {
+    opacity: 0.94;
+    transform: translate3d(-50%, -50%, 0) scale(0.96);
+  }
+  46% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1.08);
+  }
+  66% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(0.98);
+  }
+  82% {
+    opacity: 0.92;
+    transform: translate3d(-50%, -50%, 0) scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(1.08);
+  }
+}
+
+@media (max-width: 760px) {
+  .simple-question-transition .transition-pulse-symbol {
+    width: min(58vw, 320px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-transition.simple-question-transition.active {
+    animation-timing-function: linear;
+  }
+
+  .simple-question-transition .transition-pulse-symbol {
+    animation-name: simple-question-transition-pulse-reduced;
+  }
+}
+
+@keyframes simple-question-transition-pulse-reduced {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+  25%,
+  75% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+}
