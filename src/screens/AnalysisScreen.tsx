@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import symbol from '../assets/brand/clarividencia-symbol.png';
+import type { Answers, Scores } from '../types';
 
 const analysisMessages = [
   'Leyendo respuestas...',
@@ -9,7 +10,7 @@ const analysisMessages = [
   'Preparando recomendaciones...',
 ];
 
-export function AnalysisScreen() {
+export function AnalysisScreen({ answers: _answers, scores: _scores }: { answers: Answers; scores: Scores }) {
   const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
