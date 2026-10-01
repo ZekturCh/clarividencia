@@ -3326,3 +3326,33 @@ h2 {
 .result-screen .score-panel {
   overflow: visible;
 }
+
+
+/* Firebase sync controls v7 */
+.dashboard-sync-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px solid rgba(var(--brand-rgb-primary), 0.16);
+  border-radius: 8px;
+  color: white;
+  background: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.dashboard-sync-button:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.dashboard-sync-message {
+  display: block;
+  margin-top: 9px;
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
