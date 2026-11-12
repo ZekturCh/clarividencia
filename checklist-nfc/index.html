@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1821">
+  <title>Pruebas de campo · CREDIA NFC</title>
+  <style>
+    :root {
+      color-scheme: dark; font-family: Inter, system-ui, sans-serif;
+      --bg: #0b1821; --card: #11232e; --line: #294350;
+      --ink: #f1f8fa; --muted: #b1c4cc; --mint: #78f0d3; --pink: #ffaccd;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; min-height: 44px; }
+    button:focus-visible, summary:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--mint); outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+    main { max-width: 740px; margin: auto; padding: 36px 18px 60px; }
+    header { padding: 0 0 20px; }
+    header p { margin: 0 0 8px; color: var(--mint); font-size: .83rem; font-weight: 700; letter-spacing: .08em; }
+    h1 { font-size: clamp(2rem, 7vw, 3.35rem); letter-spacing: -.05em; line-height: 1.05; margin: 0 0 12px; }
+    .intro, .muted { color: var(--muted); line-height: 1.55; }
+    .intro { margin: 0; }
+    .dashboard { border: 1px solid var(--line); background: var(--card); border-radius: 16px; padding: 16px; }
+    .count { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .count strong { font-size: 1.18rem; }
+    progress { width: 100%; height: 9px; accent-color: var(--mint); margin: 9px 0; }
+    #storage { margin: 2px 0 0; font-size: .85rem; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+    .toolbar button, .states button {
+      border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #0d1b25; padding: 8px 12px;
+    }
+    .toolbar button[aria-pressed="true"], .states button[aria-pressed="true"] {
+      background: var(--mint); color: #0a2525; border-color: var(--mint); font-weight: 700;
+    }
+    .states button[data-state="fail"][aria-pressed="true"] {
+      color: #37142a; background: var(--pink); border-color: var(--pink);
+    }
+    #copy { margin-left: auto; }
+    #copy-result { min-height: 1.25em; margin: 0; font-size: .85rem; }
+    #manual-report { min-height: 130px; margin: 8px 0 0; }
+    section { margin-top: 30px; }
+    section h2 { margin: 0 0 12px; letter-spacing: -.025em; font-size: 1.35rem; }
+    .test {
+      padding: 15px; border: 1px solid var(--line); border-left: 4px solid var(--line);
+      border-radius: 12px; background: var(--card); margin-bottom: 8px;
+    }
+    .test[data-state="pass"] { border-left-color: var(--mint); }
+    .test[data-state="fail"] { border-left-color: var(--pink); }
+    h3 { font-size: 1rem; margin: 0 0 6px; line-height: 1.35; }
+    .steps { color: var(--muted); margin: 0 0 12px; line-height: 1.5; font-size: .91rem; }
+    .states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .states button { padding: 6px 4px; }
+    details { margin: 10px 0 0; }
+    summary { min-height: 40px; padding: 9px 0; cursor: pointer; color: var(--muted); font-size: .9rem; }
+    textarea { display: block; width: 100%; min-height: 72px; padding: 9px; resize: vertical; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+    @media (min-width: 560px) { main { padding: 58px 24px 80px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p>CREDIA NFC · SUMMIT</p>
+    <h1>Pruebas de campo</h1>
+    <div class="intro">Marca cada resultado en el celular. Si falla, anota la estación, el equipo y qué viste. Usa registros ficticios para ensayar la limpieza.</div>
+  </header>
+  <div class="dashboard">
+    <div class="count"><strong id="progress-label" aria-live="polite">0 pruebas revisadas</strong><span id="passed-label"></span></div>
+    <progress id="progress" value="0" aria-label="Pruebas revisadas"></progress>
+    <p id="storage" class="muted" role="status">El progreso se guarda en este navegador.</p>
+  </div>
+  <div class="toolbar" aria-label="Filtros de pruebas">
+    <button type="button" data-filter="all" aria-pressed="true">Todas</button>
+    <button type="button" data-filter="pending" aria-pressed="false">Pendientes</button>
+    <button type="button" data-filter="fail" aria-pressed="false">Fallos</button>
+    <button type="button" id="copy">Copiar reporte</button>
+  </div>
+  <p id="copy-result" class="muted" role="status"></p>
+  <textarea id="manual-report" aria-label="Reporte de pruebas" readonly hidden></textarea>
+  <div id="checklist"></div>
+  <p id="empty" class="muted" hidden>No hay pruebas en este filtro.</p>
+  <noscript>Activa JavaScript para marcar las pruebas y guardar el progreso.</noscript>
+</main>
+<script>
+  const groups = [
+    ["Arranque y equipos", [
+      ["exe-restart", "Cerrar y reabrir el EXE", "Confirma dos altas. Cierra el EXE, vuelve a abrir la misma copia y comprueba que conserva altas, equipos y dirección de servicio."],
+      ["lan-access", "Abrir desde otra zona", "Prueba la URL de una estación desde cada red Wi-Fi y desde Ethernet. Comprueba que cada equipo llega al servidor por la IP del evento."],
+      ["terminal-auto", "Abrir una estación sin PIN", "Desde un navegador nuevo, abre la URL. Comprueba que aparece en Equipos y que al recargar conserva su identidad."],
+      ["assignment", "Asignar un equipo desde el panel", "Prueba pendiente de implementar. Comprueba filtros Asignados y Por asignar y que Estaciones conserve una fila por punto."],
+      ["duplicate-session", "Detectar dos pestañas en una terminal", "Prueba pendiente de implementar. Abre dos pestañas en el mismo navegador. El EXE debe mostrar un equipo, dos sesiones y un aviso."],
+    ]],
+    ["Registro y actividades", [
+      ["uid-profiles", "Reconocer la misma pulsera con ambos lectores", "Registra con el lector numérico y vuelve a leer con el HEX. Comprueba que reconoce a la misma persona y conserva los ceros iniciales."],
+      ["form-guard", "Proteger el formulario durante el registro", "Abre el formulario con una pulsera. Acerca otra mientras editas nombre y documento. Sus teclas y Enter no deben cambiar los datos ni guardar la ficha."],
+      ["save-and-cancel", "Guardar, reconocer y cancelar", "Guarda y comprueba la confirmación en el EXE. Repite la lectura para reconocer a la persona. Cancela otra ficha y verifica que no se registró."],
+      ["same-uid-race", "Leer la misma pulsera en dos registros", "Guarda casi a la vez en dos terminales. Debe quedar una ficha para la pulsera y un estado claro para el segundo intento."],
+      ["stands", "Verificar nombres y URLs de los 17 stands", "Compara los 12 stands numerados y P1–P5 con el plano. Lee en dos stands y verifica que cada visita quedó en el punto correcto."],
+      ["continuous", "Leer varias pulseras sin esperar animaciones", "Pasa A, B y A en menos de cinco segundos en el mismo stand. Comprueba que A y B se guardaron y se descartó el rebote de A."],
+      ["conference-gates", "Probar las ocho puertas", "En cada plenaria verifica dos entradas y dos salidas. Prueba doble lectura en puertas distintas y una visita sin salida. Anota cómo queda el aforo."],
+      ["rewind", "Consultar Rewind", "Comprueba que muestra el recorrido de la pulsera correcta. Mide el tiempo desde el toque y verifica que la siguiente persona recibe su propio resumen."],
+    ]],
+    ["Juegos, comida y Data Pulse", [
+      ["game-display", "Mostrar el juego y el participante correctos", "Prueba Prompt Challenge e IA o Realidad con AdoptAI. Acuerden el receptor de prueba, comparen IDs y midan el tiempo desde el toque hasta mostrar el nombre."],
+      ["game-retry", "Reenviar un toque al juego", "Interrumpe la conexión con el receptor de juegos. Al volver, el mismo event_id debe reenviarse y el juego debe mostrar una sola entrada."],
+      ["food-products", "Canjear un Burger y un Wrap", "Prueba pendiente de implementar por producto. Canjea uno de cada tipo. Repite en otro puesto y verifica que no autoriza otro del mismo producto. Coffee queda fuera del NFC."],
+      ["food-offline", "Esperar autorización de comida", "Corta la conexión de un puesto. La web debe dejar el canje pendiente. Reconecta y comprueba que el EXE autoriza una sola vez antes de entregar."],
+      ["pulse", "Guardar una encuesta anónima", "Abre Data Pulse sin pulsera. Vota del 1 al 5, corta y recupera la LAN. Comprueba un solo voto en el EXE con la pregunta y charla que estaban en pantalla."],
+    ]],
+    ["Recuperación y publicación", [
+      ["offline-capture", "Registrar durante una caída del servidor", "Con la web abierta, cierra el EXE y registra una ficha ficticia. Abre el mismo entorno. Comprueba que llega una sola vez y la cola queda al día."],
+      ["backup-failover", "Cambiar a la laptop de respaldo", "Prueba pendiente de implementar. Desconecta la principal. Verifica quién asume la misma dirección, qué datos confirmados conserva y que nunca operen dos principales."],
+      ["firebase-schema", "Leer las cinco colecciones en Firebase", "Con AdoptAI, verifica participantes, lecturas, estaciones, estado_lectores y votos. Comprueba IDs estables, hora del toque y ausencia de DNI y UID de pulsera."],
+      ["firebase-replay", "Reanudar el envío a Firebase", "Corta internet durante un lote. La LAN debe seguir operando. Reconecta y compara pendientes, documentos y cursor. Repetir un envío no debe duplicar registros."],
+      ["firebase-cutover", "Cambiar de demo a producción", "Verifica con datos ficticios que AdoptAI acepta el nuevo origen cuando puede leerlo. Si falla el acceso, debe conservar el origen anterior y avisar."],
+    ]],
+    ["Limpieza integral · solo con datos ficticios", [
+      ["clear-main", "Confirmar la limpieza en el EXE", "Prueba pendiente de implementar. Un código incorrecto debe conservar todo. Con el código correcto comprueba cero participantes, pulseras, actividades, canjes y votos. Revisa que se mantengan las estaciones."],
+      ["clear-backup-online", "Limpiar con el respaldo conectado", "Comprueba que ambas laptops queden en la misma generación vacía y que las copias anteriores no puedan reaparecer como datos operativos."],
+      ["clear-backup-offline", "Limpiar con el respaldo desconectado", "Limpia en la principal y vuelve a conectar el respaldo. Antes de atender estaciones debe aplicar la limpieza y rechazar la generación anterior."],
+      ["clear-browser", "Reconectar una tablet con pendientes anteriores", "Deja una cola sin enviar y limpia. Reconecta esa tablet. Las capturas antiguas no deben repoblar la base nueva."],
+      ["clear-firebase", "Verificar el borrado en Firebase", "Con el entorno de ensayo, revisa las cinco colecciones y cualquier proyección del evento. Una cola antigua no debe volver a subir los registros eliminados."],
+    ]],
+  ];
+  const tests = groups.flatMap(([, items]) => items);
+  const key = "clarividencia:credia-nfc-checklist:v1";
+  const labels = { pending: "Pendiente", pass: "OK", fail: "Falló" };
+  const byId = id => document.getElementById(id);
+  let records = {};
+  let filter = "all";
+  let storageAvailable = true;
+  try {
+    const saved = JSON.parse(localStorage.getItem(key) || "{}");
+    for (const [id] of tests) {
+      const row = saved?.[id];
+      if (row && Object.hasOwn(labels, row.state) && typeof row.note === "string") records[id] = row;
+    }
+    localStorage.setItem(key, JSON.stringify(records));
+  } catch {
+    storageAvailable = false;
+  }
+
+  function entry(id) {
+    return records[id] || { state: "pending", note: "" };
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(key, JSON.stringify(records));
+      storageAvailable = true;
+    } catch {
+      storageAvailable = false;
+    }
+    showStorage();
+  }
+
+  function showStorage() {
+    byId("storage").textContent = storageAvailable ? "El progreso se guarda en este navegador." :
+      "El navegador no pudo guardar. Copia el reporte antes de cerrar.";
+  }
+
+  function renderStatus() {
+    let reviewed = 0, passed = 0, visible = 0;
+    for (const [id] of tests) {
+      const state = entry(id).state;
+      if (state !== "pending") reviewed++;
+      if (state === "pass") passed++;
+      const card = byId("test-" + id);
+      card.hidden = filter !== "all" && filter !== state;
+      card.dataset.state = state;
+      if (!card.hidden) visible++;
+      for (const button of card.querySelectorAll("[data-state]")) {
+        button.setAttribute("aria-pressed", String(button.dataset.state === state));
+      }
+    }
+    for (const group of byId("checklist").children) {
+      group.hidden = !group.querySelector(".test:not([hidden])");
+    }
+    byId("progress-label").textContent = reviewed + " de " + tests.length + " revisadas";
+    byId("passed-label").textContent = passed + " OK";
+    byId("progress").value = reviewed;
+    byId("empty").hidden = visible > 0;
+  }
+
+  function element(tag, content, className) {
+    const el = document.createElement(tag);
+    if (content) el.textContent = content;
+    if (className) el.className = className;
+    return el;
+  }
+
+  for (const [title, items] of groups) {
+    const section = element("section");
+    section.append(element("h2", title));
+    for (const [id, name, steps] of items) {
+      const card = element("article", null, "test");
+      card.id = "test-" + id;
+      card.append(element("h3", name), element("p", steps, "steps"));
+      const states = element("div", null, "states");
+      states.setAttribute("role", "group");
+      states.setAttribute("aria-label", "Resultado de " + name);
+      for (const [state, label] of Object.entries(labels)) {
+        const button = element("button", label);
+        button.type = "button";
+        button.dataset.state = state;
+        button.addEventListener("click", () => {
+          records[id] = { ...entry(id), state };
+          persist();
+          renderStatus();
+        });
+        states.append(button);
+      }
+      const notes = element("details");
+      const input = element("textarea");
+      input.setAttribute("aria-label", "Notas de " + name);
+      input.placeholder = "Equipo, estación y qué pasó";
+      input.maxLength = 600;
+      input.value = entry(id).note;
+      notes.open = Boolean(input.value);
+      input.addEventListener("input", () => {
+        records[id] = { ...entry(id), note: input.value };
+        persist();
+      });
+      notes.append(element("summary", "Notas"), input);
+      card.append(states, notes);
+      section.append(card);
+    }
+    byId("checklist").append(section);
+  }
+
+  for (const button of document.querySelectorAll("[data-filter]")) {
+    button.addEventListener("click", () => {
+      filter = button.dataset.filter;
+      for (const item of document.querySelectorAll("[data-filter]")) {
+        item.setAttribute("aria-pressed", String(item === button));
+      }
+      renderStatus();
+    });
+  }
+
+  byId("copy").addEventListener("click", async () => {
+    const report = ["CREDIA NFC · Pruebas de campo", byId("progress-label").textContent];
+    for (const [id, name] of tests) {
+      const { state, note } = entry(id);
+      report.push(labels[state] + " · " + name + (note.trim() ? "\n  " + note.trim() : ""));
+    }
+    const text = report.join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("manual-report").hidden = true;
+      byId("copy-result").textContent = "Reporte copiado.";
+    } catch {
+      const area = byId("manual-report");
+      area.value = text;
+      area.hidden = false;
+      area.focus();
+      area.select();
+      byId("copy-result").textContent = "Selecciona y copia el reporte.";
+    }
+  });
+
+  byId("progress").max = tests.length;
+  showStorage();
+  renderStatus();
+</script>
+</body>
+</html>
