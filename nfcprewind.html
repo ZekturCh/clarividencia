@@ -1,173 +1,246 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080d20"><title>Credicorp · Circuito digital</title>
-<style>
-:root{color-scheme:dark;--bg:#080d20;--panel:#111b31;--cyan:#43f4ff;--pink:#f54edf;--muted:#9aacc9;--line:#293a57}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b1940 0,transparent 55%),#080d20;color:#edf6ff;font:15px/1.4 system-ui,sans-serif}button{font:inherit;color:inherit;cursor:pointer;border:1px solid #344969;background:#18253c;border-radius:9px;padding:9px 12px}button:hover,button:focus-visible{border-color:var(--cyan);outline:2px solid #43f4ff55;outline-offset:2px}button:disabled{opacity:.5;cursor:default}main{max-width:1050px;margin:auto;padding:20px 18px 32px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{letter-spacing:.19em;font-size:21px;font-weight:800}.brand b{color:var(--cyan)}.kicker{font:700 10px monospace;letter-spacing:.18em;color:var(--cyan)}.demo{font:700 10px monospace;letter-spacing:.1em;color:#d7b4fb;border:1px solid #745294;padding:6px 9px;border-radius:5px;white-space:nowrap}.panel{border:1px solid #3c4c70;border-radius:16px;background:linear-gradient(135deg,#151e37,#0c1427);box-shadow:0 12px 36px #0005;overflow:hidden}.dex{padding:17px}.head{display:flex;align-items:center;justify-content:space-between;gap:8px}.head h1,.head h2{margin:2px 0;font-size:21px;letter-spacing:-.03em}.count{font:800 27px monospace;color:var(--cyan);white-space:nowrap}.count small{font-size:15px;color:#8799b4}.progress{height:6px;background:#29334b;border-radius:8px;margin:12px 0 15px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .4s}.badges{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.badge{min-width:0;padding:8px 2px 5px;border:1px solid #293750;border-radius:8px;background:#0b1328;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}.badge svg{width:48px;max-width:100%;height:auto;filter:grayscale(1);opacity:.48}.badge.on{border-color:var(--accent);background:#1a2b42}.badge.on svg{filter:drop-shadow(0 0 7px var(--accent));opacity:1}.badge span{font:700 10px monospace;color:#b8c9e0;overflow-wrap:anywhere}.badge em{font:9px monospace;color:#8290aa;font-style:normal}.badge.on em{color:var(--cyan)}.hint{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;color:#aebdd3;font-size:12px}.hint strong{color:#edf6ff}.map{margin-top:13px}.maphead{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line)}.maphead h2{margin:0;font-size:17px}.tools{display:flex;gap:5px}.tools button{padding:5px 11px;font-size:18px}.viewport{overflow:auto;overscroll-behavior:contain;background:#050a18;display:block;position:relative}#board{display:block;width:100%;height:auto;min-width:0;touch-action:pan-x pan-y;user-select:none}#board text{font-family:monospace;pointer-events:none}.booth{cursor:pointer;outline:none}.booth .outline{fill:transparent;stroke:transparent;stroke-width:3;pointer-events:all}.booth:hover .outline,.booth:focus-visible .outline,.booth.selected .outline{stroke:#fff;stroke-dasharray:5 4}.booth.done .roof{fill:#166c75;stroke:#75ffff;filter:url(#glow)}.booth.done .sign{fill:#144355;stroke:#43f4ff}.booth.done .door{fill:#72ffed}.booth .check{display:none}.booth.done .check{display:block}.signal{stroke-dasharray:4 15;animation:signal 3s linear infinite}@keyframes signal{to{stroke-dashoffset:-76}}.byteFloat{animation:float 1.2s steps(6) infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes float{to{transform:translateY(-7px)}}.trail{animation:trail .8s steps(3) infinite alternate}@keyframes trail{to{opacity:.25}}.legend{display:flex;flex-wrap:wrap;gap:14px;padding:11px 16px;color:#b2c0d6;font-size:11px;border-top:1px solid var(--line)}.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;background:#67829b}.dot.c{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}.dot.p{background:var(--pink)}.detail{margin-top:13px;padding:15px;display:flex;align-items:center;justify-content:space-between;gap:12px}.detail h2{margin:3px 0;font-size:18px}.detail p{margin:0;color:#aebdd3;font-size:12px}.primary{background:linear-gradient(135deg,#3ae8f2,#8eb2ff);color:#071329;font-weight:850;border:0;min-height:44px;white-space:nowrap}.win{margin-top:13px;padding:15px;text-align:center;border-color:#eac86a;background:linear-gradient(120deg,#332245,#18273d)}.win h2{color:#ffe181;margin:0 0 5px}dialog{border:1px solid var(--cyan);border-radius:15px;background:#111c33;color:white;padding:24px;text-align:center;max-width:calc(100vw - 32px);box-shadow:0 0 45px #43f4ff44}dialog::backdrop{background:#030713cc}dialog h2{color:var(--cyan);margin:5px 0}footer{text-align:center;font-size:11px;color:#8292ac;margin-top:15px}#reset{font-size:11px;padding:5px 8px} @media(min-width:780px){main{max-width:900px}.viewport{max-height:76vh}.badges{gap:12px}.badge svg{width:60px}.badge span{font-size:12px}}@media(max-width:480px){main{padding:12px 9px 24px}.brand{font-size:17px}.dex{padding:12px 9px}.head h1{font-size:18px}.badges{gap:3px}.badge{padding:5px 1px}.badge span{font-size:9px}.badge em{font-size:8px}.detail{align-items:stretch;flex-direction:column}.primary{width:100%}.maphead{padding:10px}.hint{font-size:11px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
- 
-.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line);background:#0d172b}.controls p{margin:2px 0;color:#aebdd3;font-size:12px}.dpad{display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(2,38px);gap:4px;flex:none;touch-action:none}.dpad button{padding:0;font-size:20px;touch-action:none;user-select:none;border-color:#3a6687;background:#172a43}.dpad button.active{background:#226173;color:#aaffff}.dpad [data-dir=up]{grid-column:2}.dpad [data-dir=left]{grid-column:1;grid-row:2}.dpad [data-dir=down]{grid-column:2;grid-row:2}.dpad [data-dir=right]{grid-column:3;grid-row:2}.visit-modal{width:min(430px,calc(100vw - 28px));text-align:left;padding:20px}.visit-modal h2{font-size:22px;margin:5px 0 10px}.visit-modal p{color:#b7c7df}.visit-modal .primary{width:100%;margin-top:12px;white-space:normal}.visit-modal .secondary{width:100%;margin-top:8px}.visit-modal fieldset{border:1px solid #334666;border-radius:9px;margin:12px 0;padding:10px}.visit-modal legend{font-weight:700;font-size:13px}.ratings{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.ratings label,.choices label{display:block;cursor:pointer}.ratings input,.choices input{position:absolute;opacity:0}.ratings span,.choices span{display:block;text-align:center;border:1px solid #425575;border-radius:7px;padding:8px 3px;background:#192740}.ratings input:checked+span,.choices input:checked+span{border-color:var(--cyan);color:var(--cyan);background:#153e4c}.ratings input:focus-visible+span,.choices input:focus-visible+span{outline:2px solid white}.choices{display:grid;gap:6px}.choices span{text-align:left;padding:9px}.modal-tag{font:700 11px monospace;color:var(--cyan);letter-spacing:.07em}.modal-tag.pending{color:#ffb0eb}.control-note{font-size:10px!important;color:#8292ae!important}.map-target{pointer-events:none}.map-target circle{animation:targetpulse .7s alternate infinite;transform-box:fill-box;transform-origin:center}@keyframes targetpulse{to{opacity:.3;transform:scale(1.3)}}@media(max-width:480px){.controls{padding:9px 10px}.dpad{grid-template-columns:repeat(3,36px);grid-template-rows:repeat(2,35px)}}
-
-/* Vivid visual pass — no changes to the interaction model */
-body{background:radial-gradient(ellipse at 12% 0%,#143044 0,transparent 43%),radial-gradient(ellipse at 90% 5%,#382047 0,transparent 40%),#080d20}
-.panel{border-color:#425577;box-shadow:0 10px 35px #0006,inset 0 1px #8fe5ff10}
-.badge.on{box-shadow:inset 0 0 18px color-mix(in srgb,var(--accent) 15%,transparent),0 0 12px color-mix(in srgb,var(--accent) 25%,transparent)}
-.badge.on svg{animation:medalBreath 2.7s ease-in-out infinite}
-@keyframes medalBreath{0%,100%{opacity:.8;transform:scale(.96)}50%{opacity:1;transform:scale(1.045)}}
-.signal{stroke-dasharray:10 24;animation:signal 2.5s linear infinite}
-@keyframes signal{to{stroke-dashoffset:-102}}
-.signal:nth-of-type(3n){animation-duration:4.4s;animation-direction:reverse}
-.glowBreath{animation:glowBreath 2.8s ease-in-out infinite}
-@keyframes glowBreath{0%,100%{opacity:.28}50%{opacity:.92}}
-.lightChase{stroke-dasharray:7 22;animation:lightChase 2.1s linear infinite}
-@keyframes lightChase{to{stroke-dashoffset:-116}}
-.lamp{animation:lamp 3.5s steps(4,end) infinite}
-@keyframes lamp{0%,100%{opacity:.35}40%,70%{opacity:1}80%{opacity:.6}}
-.booth .roof{fill:var(--roof,#263d58);stroke:var(--zone,#6deaff)}
-.booth.done .roof{fill:var(--doneRoof,#166c75);stroke:#a0ffff;filter:url(#glow)}
-.booth .sign{stroke:var(--zone,#6deaff)}
-.booth .outline{fill:transparent}
-.booth .windowGlow{animation:lamp 3.2s steps(4,end) infinite}
-.booth .roofEdge{animation:glowBreath 2.8s ease-in-out infinite}
-.booth.done .roofEdge{animation:lightChase 1.4s linear infinite;stroke-dasharray:8 12;opacity:1;stroke:#d0ffff}
-#avatar .byteAura{animation:byteAura 1.65s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes byteAura{0%,100%{opacity:.2;transform:scale(.9)}50%{opacity:.65;transform:scale(1.12)}}
-#avatar .byteSpark{animation:byteSpark 1s steps(3,end) infinite}
-@keyframes byteSpark{0%,100%{opacity:0}50%{opacity:.9}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-/* Standby / powered circuit contrast */
-#floor .signal{opacity:.16;animation-duration:6s}
-#floor .lightChase{opacity:.25;animation-duration:4.8s}
-#floor .glowBreath,#floor .lamp{animation:standbyPulse 4.5s ease-in-out infinite}
-@keyframes standbyPulse{0%,100%{opacity:.12}50%{opacity:.36}}
-.booth .roof{fill:#25364b;stroke:#64758a;transition:fill .65s,stroke .65s}
-.booth .sign{stroke:#52647a;fill:#111e30}
-.booth .roofEdge,.booth .windowGlow,.booth .lamp{animation:none;opacity:.23}
-.booth:not(.done) .idleAccent{fill:#56687d;opacity:.55}
-.booth:not(.done) .goalMarker{fill:#39495d;stroke:#74849a}
-.booth:not(.done) .door{fill:#2d465d}
-.booth .energySpill,.booth .ledRail,.booth .ledRunner,.booth .ledPixel,.booth .powerLabel{opacity:0;pointer-events:none}
-.booth.done .roof{fill:var(--roof);stroke:var(--zone);filter:none}
-.booth.done .sign{fill:#0a2235;stroke:var(--zone)}
-.booth.done .door{fill:#aaffff}
-.booth.done .energySpill{opacity:.32;animation:spillBreath 3.2s ease-in-out infinite}
-@keyframes spillBreath{0%,100%{opacity:.16}50%{opacity:.4}}
-.booth.done .ledRail{opacity:.9;stroke:var(--zone);filter:url(#glow)}
-.booth.done .ledRunner{opacity:1;stroke:var(--zone);animation:ledChase 1.8s linear infinite}
-@keyframes ledChase{to{stroke-dashoffset:-80}}
-.booth.done .ledPixel{opacity:1;animation:ledPixel 1.8s ease-in-out infinite}
-@keyframes ledPixel{0%,100%{opacity:.35}45%,60%{opacity:1}}
-.booth.done .roofEdge{stroke:#d6ffff;animation:lightChase 2.1s linear infinite;opacity:.9}
-.booth.done .windowGlow,.booth.done .lamp{animation:glowBreath 2.6s ease-in-out infinite;opacity:1}
-.booth.done .powerLabel{opacity:1}
-.booth.justPowered .energySpill{animation:powerSweep 1.3s ease-out 1,spillBreath 3.2s 1.3s ease-in-out infinite}
-@keyframes powerSweep{0%{opacity:0}40%{opacity:.7}100%{opacity:.32}}
-.booth.justPowered .ledRunner{animation:ledChase .55s linear 3,ledChase 1.8s 1.65s linear infinite}
-.booth.justPowered .roof{animation:roofPower 1.3s ease-out 1}
-@keyframes roofPower{0%{fill:#25364b}45%{fill:#93cbe0}100%{fill:var(--roof)}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-/* Color remains visible in standby; only completed stations emit light. */
-.booth:not(.done) .roof{fill:var(--idleRoof);stroke:var(--idleEdge)}
-.booth:not(.done) .sign{fill:var(--idleSign);stroke:var(--idleEdge)}
-.booth:not(.done) .idleAccent,.booth:not(.done) .goalMarker{fill:var(--idleEdge);opacity:.75}
-.booth:not(.done) .goalMarker{stroke:var(--idleEdge)}
-.booth:not(.done) .door{fill:var(--idleDoor)}
-.booth:not(.done) .roofEdge{stroke:var(--idleEdge);opacity:.4}
-.booth.done .roof{fill:var(--roof);stroke:var(--zone)}
-.booth.done .ledRail{stroke-width:2.5}
-.booth.done .ledRunner{stroke:#e8ffff;stroke-width:3}
-@keyframes roofPower{0%{fill:var(--idleRoof)}45%{fill:var(--zone)}100%{fill:var(--roof)}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body><main><header class="top"><div><div class="brand">CREDICORP <b>❯</b></div><div class="kicker">EXPERIENCIA DE EXPLORACIÓN</div></div><span class="demo">MODO DEMO</span></header>
-<section class="panel dex"><div class="head"><div><div class="kicker">ARCHIVO DE LOGROS</div><h1>Mi recorrido</h1></div><div class="count"><span id="count">0</span><small>/7</small></div></div><div class="progress"><i id="bar"></i></div><div id="badges" class="badges"></div><div class="hint"><span id="remaining">Explora el circuito para desbloquear tus medallas.</span><button id="reset">Reiniciar demo</button></div></section>
-<section class="panel map"><div class="maphead"><div><div class="kicker">NFC · CIRCUITO 01</div><h2>Mapa de exploración</h2></div><div class="tools"><button id="minus" aria-label="Alejar">−</button><button id="fit" aria-label="Restablecer zoom">1×</button><button id="plus" aria-label="Acercar">+</button></div></div><div class="viewport" id="viewport"><svg id="board" viewBox="0 0 720 900" xmlns="http://www.w3.org/2000/svg" aria-label="Mapa navegable del evento"><defs>
-<linearGradient id="substrate" x2="0" y2="1"><stop stop-color="#142c48"/><stop offset="1" stop-color="#0b1b30"/></linearGradient><linearGradient id="rim" x2="1" y2="1"><stop stop-color="#5ffaff"/><stop offset=".5" stop-color="#4362a1"/><stop offset="1" stop-color="#f44ce2"/></linearGradient><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#365471" stroke-width=".7" opacity=".39"/><rect x="2" y="2" width="2" height="2" fill="#446c8c" opacity=".45"/></pattern><filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g id="floor"></g><g id="buildings"></g><g id="destination" class="map-target" visibility="hidden"><circle r="11" fill="none" stroke="#43f4ff" stroke-width="2"/><circle r="3" fill="#fff"/></g><g id="avatar" pointer-events="none"><ellipse class="byteAura" rx="19" ry="11" cy="-5" fill="#43f4ff" opacity=".35"/><ellipse rx="16" ry="6" cy="3" fill="#031423" opacity=".7"/><g class="byteFloat" shape-rendering="crispEdges"><rect class="byteSpark" x="-31" y="-9" width="3" height="3" fill="#f54edf"/><rect class="byteSpark" x="-22" y="5" width="3" height="3" fill="#70ffff" style="animation-delay:-.5s"/><path class="trail" d="M-7 -10H-18V-5H-27V0H-17V4H-9V-1H0" fill="#9a4efb" opacity=".7"/><path d="M-10 -24H4V-20H10V-14H14V-4H9V3H-1V-1H-8V-7H-13V-17H-10Z" fill="#073d64" stroke="#49ffff" stroke-width="2"/><path d="M-8 -21H3V-17H8V-8H4V-4H-5V-8H-9V-17Z" fill="#2fd4ff"/><path d="M-5 -15H8V-8H-5Z" fill="#09243f"/><path d="M-3 -13H0V-9H-3ZM4 -13H7V-9H4Z" fill="#baffff"/><rect x="-17" y="-16" width="3" height="3" fill="#ff6fea"/><rect x="-24" y="-8" width="3" height="3" fill="#43f4ff"/></g><rect id="namebg" x="-45" y="-48" width="90" height="19" rx="4" fill="#061123" stroke="#4ce8ff"/><text id="avatarName" text-anchor="middle" y="-35" fill="#fff" font-size="11" font-weight="bold"></text></g></svg></div><div class="controls"><div><div class="kicker">CONTROL DEL BYTE</div><p>Toca el suelo para desplazarte.</p><p class="control-note">También puedes usar WASD, flechas o los controles.</p></div><div class="dpad" aria-label="Controles de movimiento"><button data-dir="up" aria-label="Arriba">▲</button><button data-dir="left" aria-label="Izquierda">◀</button><button data-dir="down" aria-label="Abajo">▼</button><button data-dir="right" aria-label="Derecha">▶</button></div></div><div class="legend"><span><i class="dot c"></i>Visitado</span><span><i class="dot p"></i>Stand con medalla</span><span><i class="dot"></i>Otro punto del evento</span></div></section>
-<section class="panel detail" aria-live="polite"><div><div class="kicker" id="status">SELECCIONA UN STAND</div><h2 id="selectedTitle">Explora el microchip</h2><p id="selectedDesc">Toca el suelo para moverte o un edificio para visitarlo.</p></div><button id="visit" class="primary" disabled>Abrir terminal</button></section><section id="win" class="panel win" hidden><h2>◆ CIRCUITO COMPLETADO ◆</h2>¡Has conseguido las siete medallas y desbloqueado el logro final!</section><footer>Prototipo visual · Datos ficticios · Sin conexión al sistema NFC.</footer></main>
-<dialog id="award"><div class="kicker">NUEVO LOGRO</div><div id="awardIcon" style="width:90px;margin:10px auto"></div><h2 id="awardTitle"></h2><p id="awardText"></p><button id="closeAward" class="primary">Continuar explorando</button></dialog>
-<dialog id="standDialog" class="visit-modal"><div class="kicker">TERMINAL DE EXPLORACIÓN</div><h2 id="terminalTitle"></h2><div id="terminalBody"></div><button class="secondary" id="closeTerminal">Volver al mapa</button></dialog><script>
-"use strict";
-const $=id=>document.getElementById(id), NS="http://www.w3.org/2000/svg";
-const booths=[
-{id:"P5",name:"Credicorp",x:270,y:175,w:180,h:84,goal:true,color:"#f65be0",icon:4},
-{id:"P1",name:"Wonderful",x:165,y:343,w:125,h:130,goal:true,color:"#5ef4ff",icon:0},
-{id:"P2",name:"Indra",x:165,y:522,w:125,h:130,goal:true,color:"#b59cff",icon:1},
-{id:"P3",name:"IBM",x:430,y:343,w:125,h:130,goal:true,color:"#63acff",icon:2},
-{id:"P4",name:"NTT DATA",x:430,y:522,w:125,h:130,goal:true,color:"#ff83cf",icon:3},
-...["Stand 1","Strike","Netskope","Databricks","Asper","Amazon"].map((name,i)=>({id:"S"+(i+1),name,x:48,y:160+i*88,w:76,h:56,goal:i===0,color:"#62efc7",icon:5})),
-...["Stand 7","Orca","Stand 9","TCS","Deloitte","Microsoft"].map((name,i)=>({id:"S"+(i+7),name,x:596,y:160+i*88,w:76,h:56,goal:i===0,color:"#ffb96c",icon:6})),
-{id:"DS",name:"Data Stream",x:323,y:449,w:74,h:65,color:"#90aaff",type:"activity"}];
-const goals=["P1","P2","P3","P4","P5","S1","S7"].map(id=>booths.find(b=>b.id===id));
-const key="credicorp-demo-v1";let stored={};try{stored=JSON.parse(localStorage.getItem(key)||"{}")||{}}catch(e){} const names=["Alex Torres","Andrea Vega","Lucía Reyes","Diego Silva","Sofía Ramos","Gabriel Cruz"];let name=names.includes(stored.name)?stored.name:names[Math.floor(Math.random()*names.length)],visited=new Set(Array.isArray(stored.visited)?stored.visited.filter(id=>goals.some(b=>b.id===id)):[]),selected=null,zoom=1,pos={x:360,y:844},moving=0;
-let checkedIn=new Set(Array.isArray(stored.checkedIn)?stored.checkedIn.filter(id=>goals.some(b=>b.id===id)):[]);let surveys=stored.surveys&&typeof stored.surveys==="object"?stored.surveys:{};let traveling=false;function save(){try{localStorage.setItem(key,JSON.stringify({name,visited:[...visited],checkedIn:[...checkedIn],surveys}))}catch(e){}}
-function node(tag,attrs={},parent,txt){const el=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));if(txt!==undefined)el.textContent=txt;if(parent)parent.appendChild(el);return el}
-const floor=$("floor"), buildings=$("buildings");
-function rect(p,x,y,w,h,fill,stroke,extra={}){return node("rect",{x,y,width:w,height:h,fill,stroke:stroke||"none",...extra},p)}
-function path(p,d,fill,stroke,extra={}){return node("path",{d,fill,stroke:stroke||"none",...extra},p)}
-function label(p,x,y,t,size=11,fill="#e7f8ff"){return node("text",{x,y,"text-anchor":"middle","font-size":size,"font-weight":"bold",fill},p,t)}
-for(let i=0;i<15;i++){let y=70+i*53;for(let x of [5,686]){rect(floor,x,y,29,18,"#283951","#a6c4d5");rect(floor,x,y,29,4,"#c8e5ed");rect(floor,x,y+13,29,5,"#101c32")}}for(let i=0;i<11;i++){let x=57+i*57;for(let y of [6,865]){rect(floor,x,y,23,29,"#35445e","#a6c4d5");rect(floor,x,y,6,29,"#a6c6d7")}}
-const shape="M48 30H672L690 48V848L672 866H48L30 848V48Z";
-path(floor,"M48 45H672L690 63V863L672 882H48L30 863V63Z","#10182e","#293954",{"stroke-width":3});
-path(floor,shape,"url(#substrate)","url(#rim)",{"stroke-width":5});path(floor,shape,"url(#grid)","none");path(floor,"M53 45H667L676 55V840L666 851H54L44 841V55Z","none","#435e81",{"stroke-width":2});
-for(let y of [141,286,315,488,682,730,838]){path(floor,"M43 "+y+"H146L158 "+(y+12)+"H562L574 "+y+"H677","none","#245b73",{"stroke-width":3});path(floor,"M43 "+y+"H146L158 "+(y+12)+"H562L574 "+y+"H677","none","#50eaff",{class:"signal","stroke-width":1.5,opacity:.58})}
-for(let x of [143,311,409,577]){path(floor,"M"+x+" 137V690L"+(x+10)+" 700V744","none","#2d4f76",{"stroke-width":2});path(floor,"M"+x+" 137V690L"+(x+10)+" 700V744","none","#f457de",{class:"signal","stroke-width":1,opacity:.55})}
-for(let y of [301,475,700])for(let x of [143,360,577]){rect(floor,x-4,y-4,8,8,"#182d48","#4ccade");rect(floor,x-1,y-1,2,2,"#a6faff")}
-for(let x of [311,360,409])for(let y of [328,409,589,662]){rect(floor,x-5,y-5,10,10,"#111a30","#6582a0");rect(floor,x-3,y-4,6,2,"#b3d4e5")}
-label(floor,360,90,"CIRCUITO DIGITAL",13,"#6c849e");label(floor,360,866,"ACCESO",10,"#72eaff");
-function build(b){const {x,y,w,h}=b,g=node("g",{class:"booth",tabindex:0,role:"button","aria-label":b.name+" "+b.id,"data-id":b.id},buildings);let d=b.id.startsWith("P")?22:13;const palette=b.id.startsWith("P")?[b.color,["#246075","#534683","#315b87","#713763","#6f356d"][Number(b.id.slice(1))-1]||"#246075"]:b.id.startsWith("S")?[["#a68dff","#5cc8ff","#69e6bc","#ffac7e","#7eb4ff","#db9aff"][(Number(b.id.slice(1))-1)%6],["#403963","#28516e","#285b59","#68463e","#344e7e","#583b6a"][(Number(b.id.slice(1))-1)%6]]:b.type==="food"?["#ffc77a","#735137"]:b.type==="activity"?["#ff65e5","#633b71"]:["#7ab8ee","#324d68"];const c=b.goal?b.color:palette[0];const mix=(a,b,t)=>"#"+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,"0")).join("");g.style.setProperty("--zone",c);g.style.setProperty("--idleRoof",mix("#202b3b",c,.27));g.style.setProperty("--idleEdge",mix("#536174",c,.38));g.style.setProperty("--idleSign",mix("#111b2b",c,.12));g.style.setProperty("--idleDoor",mix("#233247",c,.22));g.style.setProperty("--roof",mix(palette[1],c,.37));g.style.setProperty("--doneRoof","#196574");const xx=x+6,yy=y+8,ww=w-12,hh=h-15;rect(g,x-9,y-10,w+18,h+24,c,"none",{class:"energySpill",rx:8,filter:"url(#glow)","pointer-events":"none"});rect(g,x+3,y+8,w,h,"#020a19","none",{opacity:.55});path(g,"M"+xx+" "+yy+"H"+(xx+ww)+"V"+(yy+hh)+"H"+xx+"Z","#152743","#375575",{"stroke-width":2});rect(g,xx,yy+hh-d,ww,d,"#243b59","#5b7292");rect(g,xx+ww-7,yy+6,7,hh-6,"#102038");path(g,"M"+(xx-3)+" "+(yy+5)+"L"+(xx+9)+" "+(yy-7)+"H"+(xx+ww-8)+"L"+(xx+ww+3)+" "+(yy+5)+"V"+(yy+hh-d-3)+"H"+(xx-3)+"Z","#243953",c,{"stroke-width":2,class:"roof"});path(g,"M"+(xx+8)+" "+(yy+3)+"H"+(xx+ww-9)+"V"+(yy+hh-d-12)+"H"+(xx+8)+"Z","none",c,{"stroke-width":1,opacity:.42});rect(g,xx+8,yy+hh-d-2,ww-16,3,c,"none",{class:"idleAccent",opacity:.9});path(g,"M"+(xx+7)+" "+(yy+1)+"H"+(xx+ww-8)+"V"+(yy+hh-d-6)+"H"+(xx+7)+"Z","none",c,{class:"roofEdge","stroke-width":2,style:"animation-delay:"+(-(x%7)/3)+"s",opacity:.8,"pointer-events":"none"});for(let k=0;k<(b.id.startsWith("P")?4:2);k++){let lx=xx+10+k*((ww-20)/(b.id.startsWith("P")?4:2));rect(g,lx,yy+8,6,3,c,"none",{class:"lamp",style:"animation-delay:"+(-k*.4)+"s","pointer-events":"none"});if(b.id.startsWith("P"))rect(g,lx,yy+14,10,5,"#b9efff",c,{class:"windowGlow",style:"animation-delay:"+(-k*.6)+"s","pointer-events":"none"})}let doorW=Math.min(20,ww*.3);rect(g,xx+ww/2-doorW/2,yy+hh-d+3,doorW,d-3,"#367da0","#08192d",{class:"door"});for(let wx of [xx+5,xx+ww-14])rect(g,wx,yy+hh-d+4,9,Math.max(4,d-8),"#8bdafa","#102034",{class:"windowGlow",style:"animation-delay:"+(-(wx%5)/2)+"s"});const signY=yy+Math.max(8,(hh-d)/2-9);rect(g,x+4,signY,w-8,b.id.startsWith("P")?33:20,"#0b162b",c,{class:"sign",rx:2});let fs=b.id.startsWith("P")?13:Math.min(10,(w-12)/Math.max(1,b.name.length)*1.55);label(g,x+w/2,signY+(b.id.startsWith("P")?14:13),b.name,fs);if(b.id.startsWith("P"))label(g,x+w/2,signY+26,b.id,10,"#98c9e7");if(b.goal){rect(g,x+w-13,y-3,11,11,c,"#f9eaff",{rx:2,class:"goalMarker"});const ch=node("g",{class:"check"},g);rect(ch,x+w-23,y-7,20,20,"#11636e","#6bffff",{rx:3});path(ch,"M"+(x+w-19)+" "+(y+3)+"l4 4 8 -9","none","#fff",{"stroke-width":2.5,"stroke-linecap":"square"})}if(b.goal){const rail="M"+(x+3)+" "+(y+2)+"H"+(x+w-3)+"V"+(y+h-4)+"H"+(x+3)+"Z";path(g,rail,"none",c,{class:"ledRail","stroke-width":2,"pointer-events":"none"});path(g,rail,"none","#fff",{class:"ledRunner","stroke-width":3,"stroke-dasharray":"6 14","stroke-linecap":"square","pointer-events":"none"});for(let i=0;i<6;i++){let lx=x+10+i*(w-20)/5;rect(g,lx-2,y+h-7,4,4,c,"none",{class:"ledPixel",style:"animation-delay:"+(-i*.22)+"s","pointer-events":"none"})}const tag=label(g,x+w/2,y-10,"● ENERGIZADO",9,"#b9ffff");tag.setAttribute("class","powerLabel")}rect(g,x-3,y-6,w+6,h+15,"transparent","transparent",{class:"outline",rx:3});g.addEventListener("click",()=>select(b,true));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(b,true)}})}
-
-// Decorative chip hardware, behind buildings and non-interactive.
-const ambience=node("g",{"pointer-events":"none"},floor);
-for(let i=0;i<15;i++){for(let x of [19,700]){const y=79+i*53;rect(ambience,x-4,y-3,8,6,i%2?"#ff64e8":"#72faff","none",{class:"glowBreath",style:"animation-delay:"+(-i*.19)+"s"})}}
-for(let i=0;i<11;i++){for(let y of [20,879]){rect(ambience,65+i*57,y-4,7,8,i%2?"#ff64e8":"#72faff","none",{class:"lamp",style:"animation-delay:"+(-i*.25)+"s"})}}
-for(let i=0;i<2;i++){let x=i?680:40;path(ambience,"M"+x+" 56V837","none",i?"#ff64e8":"#72faff",{"stroke-width":2,class:"lightChase",opacity:.9,style:"animation-delay:"+(-i*.7)+"s"})}
-for(let y of [300,487,703,737])for(let x of [145,310,410,575]){node("circle",{cx:x,cy:y,r:5,fill:"#081e31",stroke:"#59e6ff","stroke-width":1},ambience);node("circle",{cx:x,cy:y,r:2.6,fill:(x+y)%2?"#ff80eb":"#9effff",class:"glowBreath",style:"animation-delay:"+(-((x+y)%8)*.3)+"s"},ambience)}
-for(let i=0;i<8;i++){let x=170+i*54;path(ambience,"M"+(x-5)+" 721l5 -5 5 5 -5 5Z","none",i%2?"#f76ee8":"#67efff",{"stroke-width":1.4,class:"glowBreath",style:"animation-delay:"+(-i*.2)+"s"})}
-for(let y of [277,696])for(let x of [190,228,492,530]){rect(ambience,x-8,y-5,16,10,"#182a45","#53759c",{rx:1});rect(ambience,x-5,y-2,10,4,"#71a8d4","none",{class:"lamp",style:"animation-delay:"+(-x%7)+"s"})}
-booths.forEach(build);
-function medal(b){const glyphs=["M25 25H47V47H25ZM30 30H42V42H30Z","M36 20L54 32 36 44 18 32ZM18 43L36 55 54 43","M22 22L50 22 36 52ZM22 22L36 52L50 22","M19 25Q36 12 53 25V46Q36 60 19 46ZM19 25Q36 38 53 25M19 36Q36 49 53 36","M30 16L52 36 30 56 21 47 34 36 21 25Z","M36 30V42M28 24Q16 36 28 48M44 24Q56 36 44 48","M23 23L49 49M49 23L23 49M36 18V54M18 36H54"];return '<svg viewBox="0 0 72 72" aria-hidden="true"><path d="M36 3L57 12 69 36 57 60 36 69 15 60 3 36 15 12Z" fill="#17253e" stroke="'+b.color+'" stroke-width="3"/><path d="M36 10L53 18 61 36 53 54 36 62 19 54 11 36 19 18Z" fill="none" stroke="'+b.color+'" opacity=".45"/><path d="'+glyphs[b.icon]+'" stroke="'+b.color+'" stroke-width="3.8" stroke-linejoin="round" fill="none"/></svg>'}
-function render(){ $("count").textContent=visited.size;$("bar").style.width=(visited.size/7*100)+"%";$("remaining").textContent=visited.size===7?"¡Todos los logros desbloqueados!":"Te faltan "+(7-visited.size)+" medallas por conseguir.";$("win").hidden=visited.size!==7;$("badges").replaceChildren();for(const b of goals){let el=document.createElement("button");el.className="badge"+(visited.has(b.id)?" on":"");el.style.setProperty("--accent",b.color);el.innerHTML=medal(b)+"<span>"+b.name+"</span><em>"+(visited.has(b.id)?"ACTIVA":"PENDIENTE")+"</em>";el.addEventListener("click",()=>select(b,true));$("badges").appendChild(el)}for(const b of booths){let el=buildings.querySelector('[data-id="'+b.id+'"]');el.classList.toggle("done",visited.has(b.id));el.classList.toggle("selected",selected===b)}if(selected){let done=visited.has(selected.id);$("status").textContent=done?"MEDALLA DESBLOQUEADA":selected.goal?"MEDALLA PENDIENTE":"PUNTO DEL EVENTO";$("selectedTitle").textContent=selected.name+" · "+selected.id;$("selectedDesc").textContent=selected.goal?(done?"Ya has visitado este stand.":"Explora el stand. Permanencia sugerida: 3 minutos (no se mide)."):"Ubicación de referencia; no otorga medalla en esta demo.";$("visit").disabled=traveling;$("visit").textContent=traveling?"En camino…":done?"Ver medalla":!selected.goal?"Ver información":"Abrir terminal";if(!done&&selected.goal)$("selectedDesc").textContent=checkedIn.has(selected.id)?"Pulsera registrada en la demo. Completa la encuesta.":"Registra tu pulsera en este stand para obtener su medalla."}save()}
-function position(x,y){pos={x,y};$("avatar").setAttribute("transform","translate("+x+" "+y+")")}
-
-// Collision model: the avatar's center cannot enter any expanded booth footprint.
-// The same continuous collision test is shared by keyboard, touch and pathfinding.
-const obstacles=booths.map(b=>({l:b.x-14,r:b.x+b.w+14,t:b.y-14,b:b.y+b.h+14}));
-function free(x,y){return x>=46&&x<=674&&y>=51&&y<=851&&!obstacles.some(o=>x>o.l&&x<o.r&&y>o.t&&y<o.b)}
-function clearLine(a,b){let n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/2));for(let i=0;i<=n;i++){let t=i/n;if(!free(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t))return false}return true}
-const step=6, ox=46,oy=51, cols=105,rows=134,N=cols*rows;
-const pts=Array.from({length:N},(_,i)=>({x:ox+i%cols*step,y:oy+Math.floor(i/cols)*step}));
-const walk=Uint8Array.from(pts,p=>free(p.x,p.y)?1:0);
-function nearest(p,from){let best=-1,bd=Infinity;for(let i=0;i<N;i++){if(!walk[i])continue;let q=pts[i],d=(q.x-p.x)**2+(q.y-p.y)**2;if(d<bd&&(!from||clearLine(from,q))){bd=d;best=i}}return best}
-function routeTo(start,goal){if(clearLine(start,goal))return [start,goal];let s=nearest(start,start),e=nearest(goal,free(goal.x,goal.y)?goal:null);if(s<0||e<0)return null;
-let seen=new Int32Array(N);seen.fill(-1);seen[s]=s;let q=new Int32Array(N),head=0,tail=0;q[tail++]=s;
-while(head<tail){let i=q[head++];if(i===e)break;let x=i%cols,y=Math.floor(i/cols);for(let j of [x>0?i-1:-1,x<cols-1?i+1:-1,y>0?i-cols:-1,y<rows-1?i+cols:-1]){if(j<0||!walk[j]||seen[j]>=0||!clearLine(pts[i],pts[j]))continue;seen[j]=i;q[tail++]=j}}
-if(seen[e]<0)return null;let out=[];for(let i=e;;i=seen[i]){out.push(pts[i]);if(i===s)break}out.reverse();out.unshift(start);if(free(goal.x,goal.y)&&clearLine(out[out.length-1],goal))out.push(goal);
-let smooth=[out[0]],i=0;while(i<out.length-1){let j=out.length-1;while(j>i+1&&!clearLine(out[i],out[j]))j--;smooth.push(out[j]);i=j}return smooth}
-function target(b){let p=b.x<130?{x:b.x+b.w+18,y:b.y+b.h/2+12}:b.x>580?{x:b.x-18,y:b.y+b.h/2+12}:{x:b.x+b.w/2,y:b.y+b.h+18};if(free(p.x,p.y))return p;let i=nearest(p,null);return i<0?p:pts[i]}
-function marker(p){$("destination").setAttribute("visibility",p?"visible":"hidden");if(p)$("destination").setAttribute("transform","translate("+p.x+" "+p.y+")")}
-function stopTravel(){++moving;traveling=false;marker(null)}
-function navigate(goal,onArrival){resetControls();stopTravel();let route=routeTo({...pos},goal);if(!route){render();return}let token=moving;traveling=true;marker(route[route.length-1]);render();let i=1,last=0;function finish(){traveling=false;marker(null);render();if(onArrival)onArrival()}function frame(now){if(token!==moving)return;if(!last)last=now;let distance=Math.min(50,now-last)*.21;last=now;while(i<route.length){let p=route[i],d=Math.hypot(p.x-pos.x,p.y-pos.y);if(d<=distance+0.0001){position(p.x,p.y);distance-=d;i++;continue}if(distance>0)position(pos.x+(p.x-pos.x)*distance/d,pos.y+(p.y-pos.y)*distance/d);break}if(i>=route.length)finish();else requestAnimationFrame(frame)}requestAnimationFrame(frame)}
-function select(b,animate){selected=b;if(animate){navigate(target(b),()=>{if(selected===b)openTerminal(b)})}else render()}
-const dmap={ArrowUp:"up",w:"up",ArrowDown:"down",s:"down",ArrowLeft:"left",a:"left",ArrowRight:"right",d:"right"}, vectors={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}, held=new Set(), pointers=new Map();
-function activeDirs(){return new Set([...held,...pointers.values()])}
-function startManual(){if(traveling){stopTravel();render()}marker(null)}
-function resetControls(){held.clear();pointers.clear();document.querySelectorAll(".dpad button").forEach(b=>b.classList.remove("active"))}
-window.addEventListener("keydown",e=>{if($("standDialog").open||$("award").open||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;let d=dmap[e.key]||dmap[e.key.toLowerCase()];if(!d)return;e.preventDefault();held.add(d);startManual()});
-window.addEventListener("keyup",e=>{let d=dmap[e.key]||dmap[e.key.toLowerCase()];if(d)held.delete(d)});window.addEventListener("blur",resetControls);
-document.querySelectorAll(".dpad button").forEach(el=>{const up=e=>{pointers.delete(e.pointerId);el.classList.remove("active")};el.addEventListener("pointerdown",e=>{e.preventDefault();el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,el.dataset.dir);el.classList.add("active");startManual()});el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);el.addEventListener("lostpointercapture",up)});
-let prev=performance.now();function manualFrame(now){let dt=Math.min(40,now-prev);prev=now;let dirs=activeDirs();if(dirs.size&&!$("standDialog").open&&!$("award").open){let dx=0,dy=0;for(let d of dirs){dx+=vectors[d][0];dy+=vectors[d][1]}let l=Math.hypot(dx,dy);if(l){let sx=dx/l*dt*.19,sy=dy/l*dt*.19;let a={x:pos.x+sx,y:pos.y};if(clearLine(pos,a))position(a.x,a.y);let b={x:pos.x,y:pos.y+sy};if(clearLine(pos,b))position(b.x,b.y)}}requestAnimationFrame(manualFrame)}requestAnimationFrame(manualFrame);
-let downPoint=null;$("board").addEventListener("pointerdown",e=>{downPoint={x:e.clientX,y:e.clientY}});$("board").addEventListener("click",e=>{if(e.target.closest(".booth"))return;if(downPoint&&Math.hypot(e.clientX-downPoint.x,e.clientY-downPoint.y)>10)return;let p=$("board").createSVGPoint();p.x=e.clientX;p.y=e.clientY;let q=p.matrixTransform($("board").getScreenCTM().inverse());if(!free(q.x,q.y))return;selected=null;$("status").textContent="EXPLORACIÓN LIBRE";$("selectedTitle").textContent="En los pasillos del chip";$("selectedDesc").textContent="Selecciona un stand o una medalla para abrir su terminal.";$("visit").disabled=true;navigate({x:q.x,y:q.y})});
-function closeDialog(d){if(typeof d.close==="function")d.close();else d.removeAttribute("open")}
-function showDialog(d){resetControls();if(typeof d.showModal==="function"){if(!d.open)d.showModal()}else d.setAttribute("open","")}
-let newestPower=null;function grant(b){newestPower=b.id;visited.add(b.id);render();closeDialog($("standDialog"));$("awardIcon").innerHTML=medal(b);$("awardTitle").textContent=visited.size===7?"¡Circuito completado!":"¡Medalla desbloqueada!";$("awardText").textContent=b.name+" · "+visited.size+" de 7 medallas";showDialog($("award"))}
-function openTerminal(b){selected=b;render();$("terminalTitle").textContent=b.name+" · "+b.id;let body=$("terminalBody");
-if(!b.goal){body.innerHTML='<p>Este espacio forma parte del evento. No otorga medalla en este circuito de demostración.</p>'}
-else if(visited.has(b.id)){body.innerHTML='<div style="width:86px;margin:auto">'+medal(b)+'</div><div class="modal-tag">MEDALLA DESBLOQUEADA</div><p>Ya completaste esta estación. ¡Continúa explorando!</p>'}
-else if(!checkedIn.has(b.id)){body.innerHTML='<div class="modal-tag pending">PULSERA PENDIENTE</div><p>Para desbloquear la medalla debes haber registrado tu pulsera NFC en este stand.</p><p>Explora la experiencia; te sugerimos permanecer unos 3 minutos. No se mide el tiempo.</p><button id="fakeScan" class="primary">Simular registro de pulsera</button><p class="control-note">Simulación local. No se conecta a ningún lector NFC.</p>';$("fakeScan").onclick=()=>{checkedIn.add(b.id);save();openTerminal(b)}}
-else {body.innerHTML='<div class="modal-tag">✓ PULSERA REGISTRADA · DEMO</div><p>Completa esta encuesta de satisfacción para conseguir tu medalla.</p><form id="survey"><fieldset><legend>¿Cómo calificarías la experiencia?</legend><div class="ratings">'+[1,2,3,4,5].map(n=>'<label><input type="radio" name="rating" value="'+n+'" required><span>'+n+' ★</span></label>').join("")+'</div><div class="control-note">1: poco satisfactoria · 5: excelente</div></fieldset><fieldset><legend>¿Te gustaría conocer más sobre esta propuesta?</legend><div class="choices">'+["Sí","Tal vez","No por ahora"].map(t=>'<label><input type="radio" name="interest" value="'+t+'" required><span>'+t+'</span></label>').join("")+'</div></fieldset><button class="primary" type="submit">Obtener mi medalla</button><p class="control-note">Respuestas de demostración, guardadas solo en este navegador.</p></form>';$("survey").onsubmit=e=>{e.preventDefault();if(!checkedIn.has(b.id)||visited.has(b.id))return;let data=new FormData(e.currentTarget);surveys[b.id]={rating:Number(data.get("rating")),interest:data.get("interest")};grant(b)}}
-showDialog($("standDialog"))}
-$("closeTerminal").onclick=()=>closeDialog($("standDialog"));
-$("visit").addEventListener("click",()=>{if(!selected||traveling)return;let b=selected,t=target(b);if(Math.hypot(pos.x-t.x,pos.y-t.y)<10)openTerminal(b);else navigate(t,()=>openTerminal(b))});
-function playPower(){if(!newestPower)return;const el=buildings.querySelector('[data-id="'+newestPower+'"]');newestPower=null;if(!el)return;el.classList.remove("justPowered");void el.getBoundingClientRect();el.classList.add("justPowered");setTimeout(()=>el.classList.remove("justPowered"),1800)}$("award").addEventListener("close",playPower);$("closeAward").onclick=()=>{if(typeof $("award").close==="function")$("award").close();else {$("award").removeAttribute("open");playPower()}};
-$("reset").onclick=()=>{stopTravel();resetControls();newestPower=null;buildings.querySelectorAll(".justPowered").forEach(el=>el.classList.remove("justPowered"));visited.clear();checkedIn.clear();surveys={};selected=null;name=names[Math.floor(Math.random()*names.length)];$("avatarName").textContent=name;position(360,844);$("status").textContent="SELECCIONA UN STAND";$("selectedTitle").textContent="Explora el microchip";$("selectedDesc").textContent="Toca cualquier edificio para ver su información.";$("visit").textContent="Abrir terminal";$("visit").disabled=true;render()};
-function setZoom(z){zoom=Math.max(1,Math.min(2.5,z));$("board").style.width=(zoom*100)+"%";$("fit").textContent=zoom.toFixed(1)+"×";$("minus").disabled=zoom===1;$("plus").disabled=zoom===2.5} $("minus").onclick=()=>setZoom(zoom-.25);$("plus").onclick=()=>setZoom(zoom+.25);$("fit").onclick=()=>setZoom(1);
-$("avatarName").textContent=name;position(360,844);setZoom(1);render();
-</script></body></html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#080d20" />
+    <title>Credicorp · Circuito digital</title>
+    <link rel="stylesheet" href="./nfcprewind-assets/game.css" />
+  </head>
+  <body>
+    <main>
+      <header class="top">
+        <div>
+          <div class="brand">CREDICORP <b>❯</b></div>
+          <div class="kicker">EXPERIENCIA DE EXPLORACIÓN</div>
+        </div>
+        <span class="demo" id="mode-label">MODO DEMO</span>
+      </header>
+      <p id="kiosk-status" role="status" hidden></p>
+      <section class="panel dex">
+        <div class="head">
+          <div>
+            <div class="kicker">ARCHIVO DE LOGROS</div>
+            <h1>Mi recorrido</h1>
+          </div>
+          <div class="count"><span id="count">0</span><small>/7</small></div>
+        </div>
+        <div
+          class="progress"
+          role="progressbar"
+          aria-label="Medallas conseguidas"
+          aria-valuemin="0"
+          aria-valuemax="7"
+          aria-valuenow="0"
+        >
+          <i id="bar"></i>
+        </div>
+        <div id="badges" class="badges"></div>
+        <div class="hint">
+          <span id="remaining"
+            >Explora el circuito para desbloquear tus medallas.</span
+          ><button id="reset">Reiniciar demo</button>
+        </div>
+        <details id="pending-stands" hidden>
+          <summary>Stands pendientes</summary>
+          <ul id="pending-list"></ul>
+        </details>
+      </section>
+      <section class="panel map">
+        <div class="maphead">
+          <div>
+            <div class="kicker">NFC · CIRCUITO 01</div>
+            <h2>Mapa de exploración</h2>
+          </div>
+          <div class="tools">
+            <button id="minus" aria-label="Alejar">−</button
+            ><button id="fit" aria-label="Restablecer zoom">1×</button
+            ><button id="plus" aria-label="Acercar">+</button>
+          </div>
+        </div>
+        <div class="viewport" id="viewport">
+          <svg
+            id="board"
+            viewBox="0 0 720 900"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Mapa navegable del evento"
+          >
+            <defs>
+              <linearGradient id="substrate" x2="0" y2="1">
+                <stop stop-color="#142c48" />
+                <stop offset="1" stop-color="#0b1b30" />
+              </linearGradient>
+              <linearGradient id="rim" x2="1" y2="1">
+                <stop stop-color="#5ffaff" />
+                <stop offset=".5" stop-color="#4362a1" />
+                <stop offset="1" stop-color="#f44ce2" />
+              </linearGradient>
+              <pattern
+                id="grid"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M20 0H0V20"
+                  fill="none"
+                  stroke="#365471"
+                  stroke-width=".7"
+                  opacity=".39"
+                />
+                <rect
+                  x="2"
+                  y="2"
+                  width="2"
+                  height="2"
+                  fill="#446c8c"
+                  opacity=".45"
+                />
+              </pattern>
+              <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="2.8" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <g id="floor"></g>
+            <g id="buildings"></g>
+            <g id="destination" class="map-target" visibility="hidden">
+              <circle r="11" fill="none" stroke="#43f4ff" stroke-width="2" />
+              <circle r="3" fill="#fff" />
+            </g>
+            <g id="avatar" pointer-events="none">
+              <ellipse
+                class="byteAura"
+                rx="19"
+                ry="11"
+                cy="-5"
+                fill="#43f4ff"
+                opacity=".35"
+              />
+              <ellipse rx="16" ry="6" cy="3" fill="#031423" opacity=".7" />
+              <g class="byteFloat" shape-rendering="crispEdges">
+                <rect
+                  class="byteSpark"
+                  x="-31"
+                  y="-9"
+                  width="3"
+                  height="3"
+                  fill="#f54edf"
+                />
+                <rect
+                  class="byteSpark delayed"
+                  x="-22"
+                  y="5"
+                  width="3"
+                  height="3"
+                  fill="#70ffff"
+                />
+                <path
+                  class="trail"
+                  d="M-7 -10H-18V-5H-27V0H-17V4H-9V-1H0"
+                  fill="#9a4efb"
+                  opacity=".7"
+                />
+                <path
+                  d="M-10 -24H4V-20H10V-14H14V-4H9V3H-1V-1H-8V-7H-13V-17H-10Z"
+                  fill="#073d64"
+                  stroke="#49ffff"
+                  stroke-width="2"
+                />
+                <path
+                  d="M-8 -21H3V-17H8V-8H4V-4H-5V-8H-9V-17Z"
+                  fill="#2fd4ff"
+                />
+                <path d="M-5 -15H8V-8H-5Z" fill="#09243f" />
+                <path d="M-3 -13H0V-9H-3ZM4 -13H7V-9H4Z" fill="#baffff" />
+                <rect x="-17" y="-16" width="3" height="3" fill="#ff6fea" />
+                <rect x="-24" y="-8" width="3" height="3" fill="#43f4ff" />
+              </g>
+              <rect
+                id="namebg"
+                x="-45"
+                y="-48"
+                width="90"
+                height="19"
+                rx="4"
+                fill="#061123"
+                stroke="#4ce8ff"
+              />
+              <text
+                id="avatarName"
+                text-anchor="middle"
+                y="-35"
+                fill="#fff"
+                font-size="11"
+                font-weight="bold"
+              ></text>
+            </g>
+          </svg>
+        </div>
+        <div class="controls">
+          <div>
+            <div class="kicker">CONTROL DEL BYTE</div>
+            <p>Toca el suelo para desplazarte.</p>
+            <p class="control-note">
+              También puedes usar WASD, flechas o los controles.
+            </p>
+          </div>
+          <div class="dpad" aria-label="Controles de movimiento">
+            <button data-dir="up" aria-label="Arriba">▲</button
+            ><button data-dir="left" aria-label="Izquierda">◀</button
+            ><button data-dir="down" aria-label="Abajo">▼</button
+            ><button data-dir="right" aria-label="Derecha">▶</button>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i class="dot c"></i>Visitado</span
+          ><span><i class="dot p"></i>Stand con medalla</span
+          ><span><i class="dot"></i>Otro punto del evento</span>
+        </div>
+      </section>
+      <section class="panel detail" aria-live="polite">
+        <div>
+          <div class="kicker" id="status">SELECCIONA UN STAND</div>
+          <h2 id="selectedTitle">Explora el microchip</h2>
+          <p id="selectedDesc">
+            Toca el suelo para moverte o un edificio para visitarlo.
+          </p>
+        </div>
+        <button id="visit" class="primary" disabled>Abrir terminal</button>
+      </section>
+      <section id="win" class="panel win" hidden>
+        <h2>◆ CIRCUITO COMPLETADO ◆</h2>
+        ¡Has conseguido las siete medallas y desbloqueado el logro final!
+      </section>
+      <footer id="mode-footer">
+        Prototipo visual · Datos ficticios · Sin conexión al sistema NFC.
+      </footer>
+    </main>
+    <dialog id="award" aria-labelledby="awardTitle">
+      <div class="kicker">NUEVO LOGRO</div>
+      <div id="awardIcon"></div>
+      <h2 id="awardTitle"></h2>
+      <p id="awardText"></p>
+      <button id="closeAward" class="primary">Continuar explorando</button>
+    </dialog>
+    <dialog
+      id="standDialog"
+      class="visit-modal"
+      aria-labelledby="terminalTitle"
+    >
+      <div class="kicker">TERMINAL DE EXPLORACIÓN</div>
+      <h2 id="terminalTitle"></h2>
+      <div id="terminalBody"></div>
+      <button class="secondary" id="closeTerminal">Volver al mapa</button>
+    </dialog>
+    <!-- credia-local -->
+    <script src="./nfcprewind-assets/progress.js" defer></script>
+    <script src="./nfcprewind-assets/game.js" defer></script>
+  </body>
+</html>
